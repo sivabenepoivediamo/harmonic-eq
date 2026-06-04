@@ -192,7 +192,7 @@ Multiplies every note number by an integer. Typically used after Mod to stretch 
 ---
 
 ### Relative Mode
-Rotates through the note set starting at a given offset and reads out a given number of notes, wrapping and extending upward by an octave each cycle. The two fields are **offset** (which note to start from) and **length** (how many notes to output; 0 means same as input count).
+Rotates through the note set starting at a given offset and reads out a given number of notes, wrapping and extending upward by an automatically calculated period for each cycle. The two fields are **offset** (which note to start from) and **length** (how many notes to output; 0 means same as input count).
 
 *This is how you derive modes from a scale — rotating a major scale by 1 starting step gives Dorian, by 2 gives Phrygian, etc.*
 
