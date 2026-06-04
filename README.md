@@ -148,7 +148,7 @@ Two rows of the keyboard map to two chromatic octaves:
 
 - **Lower octave:** `Z S X D C V G B H N J M` → C through B
 - **Upper octave:** `Q 2 W 3 E R 5 T 6 Y 7 U` → C through B (one octave up)
-- **Shift octave:** `−` to go down, `=` to go up
+- **Shift octave:** `−` to go down, `+` to go up
 
 ---
 
