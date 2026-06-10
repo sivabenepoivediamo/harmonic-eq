@@ -156,24 +156,7 @@ Two rows of the keyboard map to two chromatic octaves:
 
 Each track has its own chain of operations that can reshape the note set before it reaches the EQ bands. Operations are toggled on/off individually and can be reordered by dragging the `⠿` handle. They run top-to-bottom in the order shown.
 
----
-
-### Transpose
-Shifts every note up or down by a fixed number of semitones. Positive = up, negative = down.
-
-*Example: entering `+12` moves all notes up one octave.*
-
----
-
-### Invert
-Mirrors the note set around one of its own notes. The number field sets which note is the mirror point (0 = lowest note, 1 = second lowest, etc.).
-
-*Example: a C major chord inverted around C gives the same intervals but flipped downward.*
-
----
-
-### Complement
-Replaces the note set with all the notes that are **not** in it, within the same span. If you have 3 notes from a 12-note octave, complement gives you the other 9.
+The default order is: **Mod → Multiply → Transpose → Invert → Complement → Parallel Mode → Relative Mode → Negative → Spread → Resize.**
 
 ---
 
@@ -191,10 +174,43 @@ Multiplies every note number by an integer. Typically used after Mod to stretch 
 
 ---
 
+### Transpose
+Shifts every note up or down by a fixed number of semitones. Positive = up, negative = down.
+
+*Example: entering `+12` moves all notes up one octave.*
+
+---
+
+### Invert
+Mirrors the note set around one of its own notes. The number field sets which note is the mirror point (0 = lowest note, 1 = second lowest, etc.).
+
+*Example: a C major chord inverted around index 0 (C) gives the same intervals flipped downward.*
+
+---
+
+### Complement
+Replaces the note set with all the notes that are **not** in it, within the same span. If you have 3 notes from a 12-note octave, complement gives you the other 9.
+
+---
+
+### Parallel Mode
+Derives a mode of the note set by rotating the interval pattern to start from a different scale degree. The **k** field selects which degree to use as the new root (0 = no change, 1 = start from the second note, etc.). The output always has the same number of notes as the input and is anchored to the same pitch region.
+
+*Example: a C major triad [C, E, G] at k=1 gives the intervals measured from E: [E, G, C] — a minor third up, then a perfect fourth.*
+
+---
+
 ### Relative Mode
 Rotates through the note set starting at a given offset and reads out a given number of notes, wrapping and extending upward by an automatically calculated period for each cycle. The two fields are **offset** (which note to start from) and **length** (how many notes to output; 0 means same as input count).
 
-*This is how you derive modes from a scale — rotating a major scale by 1 starting step gives Dorian, by 2 gives Phrygian, etc.*
+*This is how you derive modes from a scale — rotating a major scale by 1 gives Dorian, by 2 gives Phrygian, etc.*
+
+---
+
+### Negative
+Applies the harmonic negation of the note set around a pitch-class axis. The **axis** field sets the reflection point (0–11). The **standard** checkbox enables the canonical ×2/÷2 transform that gives half-step resolution; unchecking it mirrors directly around the raw axis value. The result is kept in the same octave region as the input.
+
+*Example: a major triad negated around axis 10 (B♭) produces its harmonic mirror — a minor triad with the same quality but reflected interval structure.*
 
 ---
 
@@ -204,3 +220,8 @@ Voices the notes across octaves to open up clusters. Notes are redistributed so 
 *Example: three notes all a semitone apart get spread across multiple octaves into an open voicing.*
 
 ---
+
+### Resize
+Extracts a slice of notes from the set using cyclic index access. The **start** and **end** fields set the index range. Indices beyond the set size wrap cyclically, adding or subtracting the calculated period — so you can reach into higher or lower octave repetitions of the pattern. If start is greater than end, the output is reversed.
+
+*Example: a 3-note set with start=1, end=4 gives notes at indices 1, 2, 0+octave, 1+octave — extending the pattern upward.*
