@@ -37,11 +37,40 @@
   --panel-radius: 6px;
   --gap: 14px;
 }
+[data-theme="dark"] {
+  /* Accent colors — identical to light mode so highlights look the same */
+  --blue: #1a56db;
+  --blue-mid: #3b82f6;
+  --blue-light: #172554;
+  --blue-faint: #0f172a;
+  --amber: #d97706;
+  --amber-mid: #f59e0b;
+  --amber-light: #271900;
+  --red: #dc2626;
+  --red-light: #1f0707;
+  --green: #16a34a;
+  --green-mid: #22c55e;
+  --green-light: #052e10;
+  --violet: #7c3aed;
+  --violet-mid: #8b5cf6;
+  --violet-light: #1e1040;
+  --violet-faint: #160b30;
+  /* Surfaces, borders, text — go dark */
+  --surface: #1c1c1c;
+  --surface-secondary: #141414;
+  --surface-plot: #111111;
+  --body-bg: #0a0a0a;
+  --border: #2e2e2e;
+  --border-strong: #404040;
+  --text: #e2e2e2;
+  --text-mid: #8a8a8a;
+  --text-dim: #4a4a4a;
+}
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { background: #e8edf4; }
+html { background: var(--body-bg, #e8edf4); }
 body {
   font-family: var(--font-body);
-  background: #e8edf4;
+  background: var(--body-bg, #e8edf4);
   color: var(--text);
   min-height: 100vh;
   display: flex; flex-direction: column; align-items: center;
@@ -461,7 +490,7 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
 .note-col.midi-held .ns-label { color: var(--amber); }
 
 /* Sliders */
-.cslider { position: relative; border-radius: 3px; background: #eaecf2; border: 1px solid var(--border); cursor: ns-resize; flex-shrink: 0; touch-action: none; overflow: visible; }
+.cslider { position: relative; border-radius: 3px; background: var(--surface-secondary); border: 1px solid var(--border); cursor: ns-resize; flex-shrink: 0; touch-action: none; overflow: visible; }
 .cslider.gain { width: 20px; height: 110px; }
 .cslider.q    { width: 15px; height:  86px; }
 .cslider.gain.compact { width: 18px; height: 70px; }
@@ -475,8 +504,8 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
 .q    .cslider-fill        { background: var(--amber-mid); }
 .zero-tick { position: absolute; left: 50%; transform: translateX(-50%); width: 8px; height: 1px; background: rgba(26,86,219,.45); pointer-events: none; }
 .cslider-thumb { position: absolute; left: 50%; transform: translateX(-50%); border-radius: 50%; pointer-events: none; z-index: 2; transition: box-shadow .1s; }
-.gain .cslider-thumb { width: 10px; height: 10px; background: var(--blue); border: 1.5px solid #fff; box-shadow: 0 0 0 1.5px var(--blue-mid), 0 1px 4px rgba(26,86,219,.45); }
-.q .cslider-thumb { width: 8px; height: 8px; background: var(--amber); border: 1.5px solid #fff; box-shadow: 0 0 0 1.5px var(--amber-mid), 0 1px 3px rgba(217,119,6,.4); }
+.gain .cslider-thumb { width: 10px; height: 10px; background: var(--blue); border: 1.5px solid var(--surface); box-shadow: 0 0 0 1.5px var(--blue-mid), 0 1px 4px rgba(26,86,219,.45); }
+.q .cslider-thumb { width: 8px; height: 8px; background: var(--amber); border: 1.5px solid var(--surface); box-shadow: 0 0 0 1.5px var(--amber-mid), 0 1px 3px rgba(217,119,6,.4); }
 
 /* Scale-track slider overrides */
 .scale-col .gain .cslider-spine { background: rgba(124,58,237,.18); }
@@ -555,6 +584,96 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
 .clear-scale-btn { font-family: var(--font-mono); font-size: 9px; padding: 2px 8px; border: 1px solid rgba(124,58,237,.3); background: transparent; color: var(--violet); border-radius: 3px; cursor: pointer; transition: all .1s; }
 .clear-scale-btn:hover { background: var(--red-light); border-color: var(--red); color: var(--red); }
 
+/* ── Theme toggle ── */
+.theme-btn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.theme-btn:hover { color: var(--text); border-color: var(--border-strong); background: none; }
+
+/* ── Dark mode overrides ── */
+
+/* Panel labels: uniform dim, no color accents */
+[data-theme="dark"] .panel-label,
+[data-theme="dark"] .panel-label.input-accent,
+[data-theme="dark"] .panel-label.scale-accent,
+[data-theme="dark"] .bands-title { color: var(--text-dim) !important; }
+
+/* Scale bands: neutral grey instead of violet */
+[data-theme="dark"] .note-col.scale-col .ns-label { color: var(--text-mid) !important; }
+[data-theme="dark"] .note-col.scale-col .q-val { color: var(--text-mid) !important; }
+[data-theme="dark"] .scale-col .gain .cslider-fill { background: var(--text-mid) !important; }
+[data-theme="dark"] .scale-col .gain .cslider-spine { background: var(--border-strong) !important; }
+[data-theme="dark"] .scale-col .zero-tick { background: var(--border-strong) !important; }
+[data-theme="dark"] .scale-col .gain .cslider-thumb {
+  background: var(--text-mid) !important;
+  box-shadow: 0 0 0 1.5px var(--border-strong) !important;
+}
+
+/* White piano keys: ivory base */
+[data-theme="dark"] .pk-white,
+[data-theme="dark"] .rp-white {
+  background: #d4d4d4;
+  border-color: #999;
+  box-shadow: none;
+}
+[data-theme="dark"] .pk-white .pk-label { color: rgba(0,0,0,.3); }
+[data-theme="dark"] .pk-white:hover { background: linear-gradient(to bottom,#e8f0ff,#dbeafe 60%); border-color: var(--blue-mid); }
+[data-theme="dark"] .pk-white.in-range .pk-label { color: rgba(59,130,246,.5); }
+[data-theme="dark"] .pk-white.band-on  { background: linear-gradient(to bottom,#dbeafe,#bfdbfe); border-color: var(--blue-mid); box-shadow: 0 2px 8px rgba(59,130,246,.25), inset 0 -1px 0 rgba(59,130,246,.2); }
+[data-theme="dark"] .pk-white.band-on .pk-label  { color: var(--blue); font-weight: 500; }
+[data-theme="dark"] .pk-white.scale-on { background: linear-gradient(to bottom,#ede9fe,#ddd6fe); border-color: var(--violet-mid); box-shadow: 0 2px 8px rgba(139,92,246,.25), inset 0 -1px 0 rgba(139,92,246,.2); }
+[data-theme="dark"] .pk-white.scale-on .pk-label { color: var(--violet); font-weight: 500; }
+[data-theme="dark"] .pk-white.band-both { background: linear-gradient(to bottom,#dcfce7,#bbf7d0); border-color: var(--green-mid); box-shadow: 0 2px 8px rgba(34,197,94,.25); }
+[data-theme="dark"] .pk-white.band-both .pk-label { color: var(--green); font-weight: 500; }
+[data-theme="dark"] .pk-white.held { background: linear-gradient(to bottom,#fef3c7,#fcd34d); border-color: var(--amber-mid); box-shadow: 0 2px 8px rgba(217,119,6,.35); }
+[data-theme="dark"] .pk-white.held .pk-label { color: var(--amber); font-weight: 500; }
+[data-theme="dark"] .pk-white:active, [data-theme="dark"] .pk-white.pressing { background: linear-gradient(to bottom,#dbeafe,#93c5fd); box-shadow: none; }
+
+[data-theme="dark"] .rp-white .rp-label { color: rgba(0,0,0,.3); }
+[data-theme="dark"] .rp-white:hover { background: linear-gradient(to bottom,#f0e9ff,#ede9fe 60%); border-color: var(--violet-mid); }
+[data-theme="dark"] .rp-white.active { background: linear-gradient(to bottom,#7c3aed,#6d28d9); border-color: #5b21b6; box-shadow: 0 2px 8px rgba(124,58,237,.4); }
+[data-theme="dark"] .rp-white.active .rp-label { color: #fff; font-weight: 500; }
+[data-theme="dark"] .piano-oct-label { color: rgba(0,0,0,.22); }
+
+/* Black piano keys: near-black base */
+[data-theme="dark"] .pk-black,
+[data-theme="dark"] .rp-black {
+  background: #222;
+  border-color: #111;
+  box-shadow: none;
+}
+[data-theme="dark"] .pk-black .pk-label { color: rgba(255,255,255,.28); }
+[data-theme="dark"] .pk-black:hover { background: linear-gradient(to bottom,#3b4a6b,#2d3a57 70%,#1e2a42 100%); border-color: var(--blue-mid); }
+[data-theme="dark"] .pk-black.band-on  { background: linear-gradient(to bottom,#1e40af,#1d4ed8,#1e3a8a); border-color: #60a5fa; box-shadow: 2px 3px 8px rgba(59,130,246,.5), inset 0 -2px 0 rgba(255,255,255,.15); }
+[data-theme="dark"] .pk-black.band-on .pk-label  { color: #bfdbfe; }
+[data-theme="dark"] .pk-black.scale-on { background: linear-gradient(to bottom,#5b21b6,#6d28d9,#4c1d95); border-color: #a78bfa; box-shadow: 2px 3px 8px rgba(139,92,246,.5), inset 0 -2px 0 rgba(255,255,255,.15); }
+[data-theme="dark"] .pk-black.scale-on .pk-label { color: #ddd6fe; }
+[data-theme="dark"] .pk-black.band-both { background: linear-gradient(to bottom,#14532d,#166534,#052e16); border-color: #4ade80; box-shadow: 2px 3px 8px rgba(34,197,94,.45); }
+[data-theme="dark"] .pk-black.band-both .pk-label { color: #bbf7d0; }
+[data-theme="dark"] .pk-black.held { background: linear-gradient(to bottom,#92400e,#b45309,#78350f); border-color: #fcd34d; box-shadow: 2px 3px 8px rgba(217,119,6,.5); }
+[data-theme="dark"] .pk-black.held .pk-label { color: #fef3c7; }
+[data-theme="dark"] .pk-black:active, [data-theme="dark"] .pk-black.pressing { background: linear-gradient(to bottom,#1e3a6e,#1e40af); box-shadow: none; }
+
+[data-theme="dark"] .rp-black .rp-label { color: rgba(255,255,255,.22); }
+[data-theme="dark"] .rp-black:hover { background: linear-gradient(to bottom,#4c1d95,#5b21b6 70%,#3b0764); border-color: var(--violet-mid); }
+[data-theme="dark"] .rp-black.active { background: linear-gradient(to bottom,#7c3aed,#6d28d9,#4c1d95); border-color: #a78bfa; box-shadow: 1px 2px 8px rgba(124,58,237,.5); }
+[data-theme="dark"] .rp-black.active .rp-label { color: #ddd6fe; }
+
+/* focus states */
+[data-theme="dark"] .note-input:focus { background: var(--surface); }
+[data-theme="dark"] .scale-search:focus { background: var(--surface); }
+
 @media(max-width:680px){
   body { padding: 0 10px 48px; }
   .dual-row { grid-template-columns: 1fr; }
@@ -575,6 +694,7 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
     <div class="brand-name">harmonic <strong>eq</strong></div>
     <div class="brand-sub">from scales to bands</div>
   </div>
+  <button class="theme-btn" id="themeToggle">☽</button>
 </header>
 <main>
 
@@ -742,7 +862,7 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
     <div class="kbd-help">
       Lower oct: <span>Z S X D C V G B H N J M</span> &nbsp;·&nbsp;
       Upper oct: <span>Q 2 W 3 E R 5 T 6 Y 7 U</span> &nbsp;·&nbsp;
-      Octave: <span>− / +</span>
+      Octave: <span>− / =</span>
     </div>
   </div>
 
@@ -2008,6 +2128,29 @@ window.addEventListener('resize',()=>{
 // ═══════════════════════════════════════════════════════════
 //  CANVAS DRAW
 // ═══════════════════════════════════════════════════════════
+function getThemeColors(){
+  const isDark=document.documentElement.dataset.theme==='dark';
+  return isDark ? {
+    bg:'#111111',
+    gridZero:'rgba(26,86,219,.3)', gridLine:'rgba(26,86,219,.09)',
+    labelZero:'rgba(26,86,219,.6)', label:'rgba(26,86,219,.28)',
+    inputLine:'rgba(26,86,219,.12)', scaleLine:'rgba(124,58,237,.12)',
+    fftFill:'rgba(22,163,74,.08)', fftStroke:'rgba(22,163,74,.5)',
+    eqFill:'rgba(26,86,219,.08)', eqGlow:'rgba(26,86,219,.18)', eqLine:'rgba(26,86,219,.9)',
+    dotBg:'#111111',
+    inputBase:[26,86,219], scaleBase:[124,58,237], heldBase:[217,119,6]
+  } : {
+    bg:'#f4f7fe',
+    gridZero:'rgba(26,86,219,.22)', gridLine:'rgba(26,86,219,.07)',
+    labelZero:'rgba(26,86,219,.65)', label:'rgba(26,86,219,.3)',
+    inputLine:'rgba(26,86,219,.1)', scaleLine:'rgba(124,58,237,.1)',
+    fftFill:'rgba(22,163,74,.07)', fftStroke:'rgba(22,163,74,.45)',
+    eqFill:'rgba(26,86,219,.07)', eqGlow:'rgba(26,86,219,.15)', eqLine:'rgba(26,86,219,.85)',
+    dotBg:'#f4f7fe',
+    inputBase:[26,86,219], scaleBase:[124,58,237], heldBase:[217,119,6]
+  };
+}
+
 function draw(){
   const canvas=document.getElementById('spectrum'); const wrapEl=canvas.parentElement;
   const W=wrapEl.clientWidth, H=wrapEl.clientHeight;
@@ -2021,33 +2164,34 @@ function draw(){
   const ZERO_FRAC=.65, DB_RANGE=24;
   const zeroY=PAD.top+cH*ZERO_FRAC;
   const dbToY=db=>zeroY-(db/DB_RANGE)*cH*ZERO_FRAC;
+  const C=getThemeColors();
 
-  ctx.fillStyle='#f4f7fe'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=C.bg; ctx.fillRect(0,0,W,H);
   ctx.font='9px "IBM Plex Mono",monospace';
 
   for(const db of [18,12,6,0,-6,-12,-18]){
     const y=dbToY(db); if(y<PAD.top-2||y>PAD.top+cH+2) continue;
-    if(db===0){ ctx.strokeStyle='rgba(26,86,219,.22)'; ctx.lineWidth=1; ctx.setLineDash([]); }
-    else{ ctx.strokeStyle='rgba(26,86,219,.07)'; ctx.lineWidth=.5; ctx.setLineDash([2,6]); }
+    if(db===0){ ctx.strokeStyle=C.gridZero; ctx.lineWidth=1; ctx.setLineDash([]); }
+    else{ ctx.strokeStyle=C.gridLine; ctx.lineWidth=.5; ctx.setLineDash([2,6]); }
     ctx.beginPath(); ctx.moveTo(PAD.left,y); ctx.lineTo(PAD.left+cW,y); ctx.stroke(); ctx.setLineDash([]);
-    ctx.fillStyle=db===0?'rgba(26,86,219,.65)':'rgba(26,86,219,.3)'; ctx.fillText((db>0?'+':'')+db,2,y+3);
+    ctx.fillStyle=db===0?C.labelZero:C.label; ctx.fillText((db>0?'+':'')+db,2,y+3);
   }
   ctx.textAlign='center';
   for(const f of [20,50,100,200,500,1000,2000,5000,10000,20000]){
-    const x=logX(f,cW,PAD.left); ctx.fillStyle='rgba(26,86,219,.28)'; ctx.fillText(f>=1000?(f/1000)+'k':f+'',x,H-5);
+    const x=logX(f,cW,PAD.left); ctx.fillStyle=C.label; ctx.fillText(f>=1000?(f/1000)+'k':f+'',x,H-5);
   }
   ctx.textAlign='left';
 
   for(const n of inputTrack.source){
     const freq=midiToFreq(n); if(freq<FREQ_MIN||freq>FREQ_MAX) continue;
     const x=logX(freq,cW,PAD.left);
-    ctx.strokeStyle='rgba(26,86,219,.1)'; ctx.lineWidth=.5; ctx.setLineDash([1,6]);
+    ctx.strokeStyle=C.inputLine; ctx.lineWidth=.5; ctx.setLineDash([1,6]);
     ctx.beginPath(); ctx.moveTo(x,PAD.top); ctx.lineTo(x,PAD.top+cH); ctx.stroke(); ctx.setLineDash([]);
   }
   for(const n of scaleTrack.source){
     const freq=midiToFreq(n); if(freq<FREQ_MIN||freq>FREQ_MAX) continue;
     const x=logX(freq,cW,PAD.left);
-    ctx.strokeStyle='rgba(124,58,237,.1)'; ctx.lineWidth=.5; ctx.setLineDash([1,6]);
+    ctx.strokeStyle=C.scaleLine; ctx.lineWidth=.5; ctx.setLineDash([1,6]);
     ctx.beginPath(); ctx.moveTo(x,PAD.top); ctx.lineTo(x,PAD.top+cH); ctx.stroke(); ctx.setLineDash([]);
   }
 
@@ -2060,14 +2204,14 @@ function draw(){
       const db=Math.max(FFT_MIN,Math.min(FFT_MAX,fftBuffer[bin])); const frac=(db-FFT_MIN)/(FFT_MAX-FFT_MIN); const y=Math.max(PAD.top,PAD.top+cH*(1-frac));
       if(fftFirst){ ctx.moveTo(PAD.left+px,y); fftFirst=false; } else ctx.lineTo(PAD.left+px,y);
     }
-    ctx.lineTo(PAD.left+cW,PAD.top+cH); ctx.lineTo(PAD.left,PAD.top+cH); ctx.closePath(); ctx.fillStyle='rgba(22,163,74,.07)'; ctx.fill();
+    ctx.lineTo(PAD.left+cW,PAD.top+cH); ctx.lineTo(PAD.left,PAD.top+cH); ctx.closePath(); ctx.fillStyle=C.fftFill; ctx.fill();
     ctx.beginPath(); fftFirst=true;
     for(let px=0;px<=cW;px++){
       const freq=FREQ_MIN*Math.pow(FREQ_MAX/FREQ_MIN,px/cW); const bin=Math.round(freq*analyserNode.fftSize/audioCtx.sampleRate); if(bin>=fftBuffer.length) continue;
       const db=Math.max(FFT_MIN,Math.min(FFT_MAX,fftBuffer[bin])); const frac=(db-FFT_MIN)/(FFT_MAX-FFT_MIN); const y=Math.max(PAD.top+1,PAD.top+cH*(1-frac));
       if(fftFirst){ ctx.moveTo(PAD.left+px,y); fftFirst=false; } else ctx.lineTo(PAD.left+px,y);
     }
-    ctx.strokeStyle='rgba(22,163,74,.45)'; ctx.lineWidth=1.2; ctx.stroke();
+    ctx.strokeStyle=C.fftStroke; ctx.lineWidth=1.2; ctx.stroke();
   }
 
   const pts=[];
@@ -2077,11 +2221,11 @@ function draw(){
   }
   ctx.beginPath(); ctx.moveTo(pts[0].x,zeroY);
   for(const p of pts) ctx.lineTo(p.x,p.y);
-  ctx.lineTo(pts[pts.length-1].x,zeroY); ctx.closePath(); ctx.fillStyle='rgba(26,86,219,.07)'; ctx.fill();
+  ctx.lineTo(pts[pts.length-1].x,zeroY); ctx.closePath(); ctx.fillStyle=C.eqFill; ctx.fill();
   ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y); for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x,pts[i].y);
-  ctx.strokeStyle='rgba(26,86,219,.15)'; ctx.lineWidth=3; ctx.stroke();
+  ctx.strokeStyle=C.eqGlow; ctx.lineWidth=3; ctx.stroke();
   ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y); for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x,pts[i].y);
-  ctx.strokeStyle='rgba(26,86,219,.85)'; ctx.lineWidth=1.2; ctx.stroke();
+  ctx.strokeStyle=C.eqLine; ctx.lineWidth=1.2; ctx.stroke();
 
   const pulse=.55+.45*Math.sin(t*1.6);
   const allMarkers=[
@@ -2095,12 +2239,12 @@ function draw(){
     const x=logX(freq,cW,PAD.left);
     const isScale=track.id==='scl';
     const isHeld=heldInputNotes.has(n)&&!isScale;
-    let baseColor; if(isHeld) baseColor=[217,119,6]; else if(isScale) baseColor=[124,58,237]; else baseColor=[26,86,219];
+    let baseColor; if(isHeld) baseColor=C.heldBase; else if(isScale) baseColor=C.scaleBase; else baseColor=C.inputBase;
     const [r,g,b]=baseColor;
     const dotColor=`rgba(${r},${g},${b},${0.65+0.35*pulse})`;
     ctx.strokeStyle=`rgba(${r},${g},${b},${0.12*pulse})`; ctx.lineWidth=.5; ctx.setLineDash([2,5]);
     ctx.beginPath(); ctx.moveTo(x,PAD.top+26); ctx.lineTo(x,PAD.top+cH); ctx.stroke(); ctx.setLineDash([]);
-    ctx.beginPath(); ctx.arc(x,Math.max(PAD.top+4,Math.min(PAD.top+cH-4,dbToY(track.gains[n]||0))),4,0,Math.PI*2); ctx.fillStyle='#f4f7fe'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x,Math.max(PAD.top+4,Math.min(PAD.top+cH-4,dbToY(track.gains[n]||0))),4,0,Math.PI*2); ctx.fillStyle=C.dotBg; ctx.fill();
     ctx.strokeStyle=dotColor; ctx.lineWidth=1.5; ctx.stroke();
     ctx.beginPath(); ctx.arc(x,Math.max(PAD.top+4,Math.min(PAD.top+cH-4,dbToY(track.gains[n]||0))),1.5,0,Math.PI*2); ctx.fillStyle=dotColor; ctx.fill();
     const d0=x-rowLastX[0], d1=x-rowLastX[1];
@@ -2132,6 +2276,24 @@ buildSliders(scaleTrack);
 draw();
 initMIDI();
 renderKbdStrip();
+
+// ═══════════════════════════════════════════════════════════
+//  THEME TOGGLE
+// ═══════════════════════════════════════════════════════════
+let currentTheme = 'dark';
+document.getElementById('themeToggle').addEventListener('click', () => {
+  currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+  /* Suppress transitions during theme swap */
+  const noTrans = document.createElement('style');
+  noTrans.textContent = '*, *::before, *::after { transition: none !important; }';
+  document.head.appendChild(noTrans);
+
+  document.documentElement.dataset.theme = currentTheme === 'dark' ? 'dark' : '';
+  document.getElementById('themeToggle').textContent = currentTheme === 'dark' ? '☀' : '☽';
+
+  requestAnimationFrame(() => noTrans.remove());
+});
 
 })();
 </script>
