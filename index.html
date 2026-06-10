@@ -1251,8 +1251,8 @@ function makeTrack(id){
     notes:[],
     gains:{},
     qs:{},
-    enabled:{transpose:false,invert:false,complement:false,mod:false,scale:false,relmode:false,spread:false,resize:false,negative:false},
-    stepOrder:['mod','transpose','negative','invert','complement','scale','relmode','resize','spread'],
+    enabled:{transpose:false,invert:false,complement:false,mod:false,scale:false,parmode:false,relmode:false,spread:false,resize:false,negative:false},
+    stepOrder:['mod','scale','transpose','invert','complement','parmode','relmode','negative','spread','resize'],
     linkMode:'',
     _compactOverride:undefined,
     sliderMap:new Map(),
@@ -1528,6 +1528,18 @@ function opNegative(arr,axis,standard){
   return result.map(v=>v+anchor);
 }
 
+function opParallelMode(arr,k){
+  if(!arr.length) return [];
+  // p^(k)_i = p̃_{k+i} − p̃_k  (Definition: parallel modes of positions)
+  const sorted=[...arr].sort((a,b)=>a-b);
+  const sz=sorted.length;
+  const range=calcRange(sorted,12);
+  function element(i){ const{q:cyc,r:idx}=ediv(i,sz); return sorted[idx]+Math.abs(range)*cyc; }
+  const pk=element(k);
+  const anchor=sorted[0];
+  return Array.from({length:sz},(_,i)=>element(k+i)-pk+anchor);
+}
+
 // ── Spread ────────────────────────────────────────────────
 function opSpread(notes, modulo, allowTopCluster, minRatioLow, minRatioHigh){
   if(notes.length<=1) return notes.slice();
@@ -1580,6 +1592,7 @@ function runChain(track){
       case 'complement': result=opComplement(result); break;
       case 'mod':        result=opMod(result,Math.max(1,getN(pf+'tx-mod'))); break;
       case 'scale':      { const s=getN(pf+'tx-mult'); if(s!==0) result=opScaleMult(result,s); } break;
+      case 'parmode':    result=opParallelMode(result,getN(pf+'tx-pm-k')); break;
       case 'relmode':    result=opRotoTranslate(result,getN(pf+'tx-rt-off'),Math.max(0,getN(pf+'tx-rt-len'))); break;
       case 'spread': {
         const allowTop=document.getElementById(pf+'tx-sp-top')?.checked||false;
@@ -2013,20 +2026,17 @@ function buildTransformHTML(pf,isScale){
       <span class="step-name">Mod</span>
       <input type="number" id="${pf}tx-mod" value="12" min="1" step="1" title="Wrap all notes into 0–n range"/>
     </div>
+    <div class="chain-step off${stepCls}" id="${pf}card-scale" data-op="scale">
+      <span class="drag-handle">⠿</span>
+      <button class="op-toggle off${cls}" data-op="scale">off</button>
+      <span class="step-name">Multiply</span>
+      <input type="number" id="${pf}tx-mult" value="2" step="1" title="Scale all note values by this factor"/>
+    </div>
     <div class="chain-step off${stepCls}" id="${pf}card-transpose" data-op="transpose">
       <span class="drag-handle">⠿</span>
       <button class="op-toggle off${cls}" data-op="transpose">off</button>
       <span class="step-name">Transpose</span>
       <input type="number" id="${pf}tx-scalar" value="0" step="1" title="Semitones up or down"/>
-    </div>
-    <div class="chain-step off${stepCls}" id="${pf}card-negative" data-op="negative">
-      <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="negative">off</button>
-      <span class="step-name">Negative</span>
-      <input type="number" id="${pf}tx-neg-axis" value="10" step="1" title="Pitch-class to mirror around (0–11)"/>
-      <label style="display:flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:9px;color:var(--text-dim);white-space:nowrap;cursor:pointer;user-select:none" title="Standard mode (×2 / ÷2)">
-        <input type="checkbox" id="${pf}tx-neg-std" checked style="accent-color:var(--blue);cursor:pointer" title="Use ×2/÷2 wrapping for half-step precision"/>standard
-      </label>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-invert" data-op="invert">
       <span class="drag-handle">⠿</span>
@@ -2039,11 +2049,11 @@ function buildTransformHTML(pf,isScale){
       <button class="op-toggle off${cls}" data-op="complement">off</button>
       <span class="step-name">Complement</span>
     </div>
-    <div class="chain-step off${stepCls}" id="${pf}card-scale" data-op="scale">
+    <div class="chain-step off${stepCls}" id="${pf}card-parmode" data-op="parmode">
       <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="scale">off</button>
-      <span class="step-name">Multiply</span>
-      <input type="number" id="${pf}tx-mult" value="2" step="1" title="Scale all note values by this factor"/>
+      <button class="op-toggle off${cls}" data-op="parmode">off</button>
+      <span class="step-name">Parallel Mode</span>
+      <input type="number" id="${pf}tx-pm-k" value="0" step="1" title="Mode index k (wraps cyclically)"/>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-relmode" data-op="relmode">
       <span class="drag-handle">⠿</span>
@@ -2052,12 +2062,14 @@ function buildTransformHTML(pf,isScale){
       <input type="number" id="${pf}tx-rt-off" value="0" step="1" title="Start position (negative wraps from end)"/>
       <input type="number" id="${pf}tx-rt-len" value="0" min="0" step="1" title="How many notes to take (0 = same as input)"/>
     </div>
-    <div class="chain-step off${stepCls}" id="${pf}card-resize" data-op="resize">
+    <div class="chain-step off${stepCls}" id="${pf}card-negative" data-op="negative">
       <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="resize">off</button>
-      <span class="step-name">Resize</span>
-      <input type="number" id="${pf}tx-rs-start" value="0" step="1" title="First note index (wraps with octave scaling)"/>
-      <input type="number" id="${pf}tx-rs-end" value="3" step="1" title="Last note index (start > end reverses)"/>
+      <button class="op-toggle off${cls}" data-op="negative">off</button>
+      <span class="step-name">Negative</span>
+      <input type="number" id="${pf}tx-neg-axis" value="10" step="1" title="Pitch-class to mirror around (0–11)"/>
+      <label style="display:flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:9px;color:var(--text-dim);white-space:nowrap;cursor:pointer;user-select:none" title="Standard mode (×2 / ÷2)">
+        <input type="checkbox" id="${pf}tx-neg-std" checked style="accent-color:var(--blue);cursor:pointer" title="Use ×2/÷2 wrapping for half-step precision"/>standard
+      </label>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-spread" data-op="spread">
       <span class="drag-handle">⠿</span>
@@ -2066,7 +2078,14 @@ function buildTransformHTML(pf,isScale){
       <label style="display:flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:9px;color:var(--text-dim);white-space:nowrap;cursor:pointer;user-select:none" title="Allow cluster at top">
         <input type="checkbox" id="${pf}tx-sp-top" style="accent-color:var(--blue);cursor:pointer" title="Allow tight clustering at the top"/>top cluster
       </label>
-    </div>`
+    </div>
+    <div class="chain-step off${stepCls}" id="${pf}card-resize" data-op="resize">
+      <span class="drag-handle">⠿</span>
+      <button class="op-toggle off${cls}" data-op="resize">off</button>
+      <span class="step-name">Resize</span>
+      <input type="number" id="${pf}tx-rs-start" value="0" step="1" title="First note index (wraps with octave scaling)"/>
+      <input type="number" id="${pf}tx-rs-end" value="3" step="1" title="Last note index (start > end reverses)"/>
+    </div>`;
 }
 
 function initChain(track){
@@ -2087,7 +2106,7 @@ function initChain(track){
     });
   });
 
-  ['tx-scalar','tx-axis','tx-mod','tx-mult','tx-rt-off','tx-rt-len','tx-rs-start','tx-rs-end','tx-neg-axis'].forEach(id=>{
+  ['tx-scalar','tx-axis','tx-mod','tx-mult','tx-pm-k','tx-rt-off','tx-rt-len','tx-rs-start','tx-rs-end','tx-neg-axis'].forEach(id=>{
     const el=document.getElementById(pf+id); if(el) el.addEventListener('input',()=>runChain(track));
   });
   const spTopEl=document.getElementById(pf+'tx-sp-top');
