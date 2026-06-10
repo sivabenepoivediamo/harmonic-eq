@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -694,7 +694,7 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
     <div class="brand-name">harmonic <strong>eq</strong></div>
     <div class="brand-sub">from scales to bands</div>
   </div>
-  <button class="theme-btn" id="themeToggle">☀</button>
+  <button class="theme-btn" id="themeToggle">☽</button>
 </header>
 <main>
 
@@ -1251,8 +1251,8 @@ function makeTrack(id){
     notes:[],
     gains:{},
     qs:{},
-    enabled:{transpose:false,invert:false,complement:false,mod:false,scale:false,relmode:false,spread:false},
-    stepOrder:['transpose','invert','complement','mod','scale','relmode','spread'],
+    enabled:{transpose:false,invert:false,complement:false,mod:false,scale:false,relmode:false,spread:false,resize:false,negative:false},
+    stepOrder:['mod','transpose','negative','invert','complement','scale','relmode','resize','spread'],
     linkMode:'',
     _compactOverride:undefined,
     sliderMap:new Map(),
@@ -1487,6 +1487,46 @@ function opComplement(arr){ if(!arr.length) return []; const mn=Math.min(...arr)
 function opRotoTranslate(arr,off,len){ if(!arr.length) return []; const sorted=[...arr].sort((a,b)=>a-b),sz=sorted.length; const outLen=len>0?len:sz,range=calcRange(sorted,12); const out=[]; for(let i=0;i<outLen;i++){ const{q:cyc,r:idx}=ediv(off+i,sz); out.push(sorted[idx]+range*cyc); } return out; }
 function opMod(arr,m){ const seen=new Set(); return arr.map(v=>ediv(v,m).r).filter(v=>{ if(seen.has(v)) return false; seen.add(v); return true; }).sort((a,b)=>a-b); }
 function opScaleMult(arr,s){ return arr.map(v=>v*s); }
+function opResize(arr,start,end){
+  if(!arr.length) return [];
+  // Mirror the C++ PositionVector logic exactly:
+  // element(index) = data[idx] + range * cycles  (cyclic, range-scaled)
+  const sorted=[...arr].sort((a,b)=>a-b);
+  const sz=sorted.length;
+  const range=calcRange(sorted,12);
+  function element(index){
+    const{q:cycles,r:idx}=ediv(index,sz);
+    return sorted[idx]+Math.abs(range)*cycles;
+  }
+  const out=[];
+  if(start<=end){
+    for(let i=start;i<=end;i++) out.push(element(i));
+  } else {
+    for(let i=start;i>=end;i--) out.push(element(i));
+  }
+  return out;
+}
+
+function opNegative(arr,axis,standard){
+  if(!arr.length) return [];
+  // Subtract the lowest note, operate on the normalised set,
+  // then add it back so the result stays in the same octave region.
+  const anchor=Math.min(...arr);
+  let result=arr.map(v=>v-anchor);
+  let adj=axis;
+  // Step 1: double (standard mode)
+  if(standard){ result=result.map(v=>v*2); adj=axis*2-1; }
+  // Steps 2-4: mirror around adj
+  result=result.map(v=>adj-(v-adj));
+  // Step 5: halve (standard mode)
+  if(standard){ result=result.map(v=>v/2); }
+  // Step 6: sort
+  result.sort((a,b)=>a-b);
+  // Step 7: rotoTranslate(-1)
+  result=opRotoTranslate(result,-1,0);
+  // Shift back to original pitch region
+  return result.map(v=>v+anchor);
+}
 
 // ── Spread ────────────────────────────────────────────────
 function opSpread(notes, modulo, allowTopCluster, minRatioLow, minRatioHigh){
@@ -1544,6 +1584,15 @@ function runChain(track){
       case 'spread': {
         const allowTop=document.getElementById(pf+'tx-sp-top')?.checked||false;
         result=opSpread(result,12,allowTop,4/3,9/8);
+      } break;
+      case 'resize': {
+        const s=getN(pf+'tx-rs-start'), e=getN(pf+'tx-rs-end');
+        result=opResize(result,s,e);
+      } break;
+      case 'negative': {
+        const ax=getN(pf+'tx-neg-axis');
+        const std=document.getElementById(pf+'tx-neg-std')?.checked!==false;
+        result=opNegative(result,ax,std);
       } break;
     }
   }
@@ -1958,50 +2007,66 @@ function buildTransformHTML(pf,isScale){
   const cls=isScale?' scale-toggle':'';
   const stepCls=isScale?' scale-step':'';
   return `
+    <div class="chain-step off${stepCls}" id="${pf}card-mod" data-op="mod">
+      <span class="drag-handle">⠿</span>
+      <button class="op-toggle off${cls}" data-op="mod">off</button>
+      <span class="step-name">Mod</span>
+      <input type="number" id="${pf}tx-mod" value="12" min="1" step="1" title="Wrap all notes into 0–n range"/>
+    </div>
     <div class="chain-step off${stepCls}" id="${pf}card-transpose" data-op="transpose">
       <span class="drag-handle">⠿</span>
       <button class="op-toggle off${cls}" data-op="transpose">off</button>
       <span class="step-name">Transpose</span>
-      <input type="number" id="${pf}tx-scalar" value="0" step="1"/>
+      <input type="number" id="${pf}tx-scalar" value="0" step="1" title="Semitones up or down"/>
+    </div>
+    <div class="chain-step off${stepCls}" id="${pf}card-negative" data-op="negative">
+      <span class="drag-handle">⠿</span>
+      <button class="op-toggle off${cls}" data-op="negative">off</button>
+      <span class="step-name">Negative</span>
+      <input type="number" id="${pf}tx-neg-axis" value="10" step="1" title="Pitch-class to mirror around (0–11)"/>
+      <label style="display:flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:9px;color:var(--text-dim);white-space:nowrap;cursor:pointer;user-select:none" title="Standard mode (×2 / ÷2)">
+        <input type="checkbox" id="${pf}tx-neg-std" checked style="accent-color:var(--blue);cursor:pointer" title="Use ×2/÷2 wrapping for half-step precision"/>standard
+      </label>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-invert" data-op="invert">
       <span class="drag-handle">⠿</span>
       <button class="op-toggle off${cls}" data-op="invert">off</button>
       <span class="step-name">Invert</span>
-      <input type="number" id="${pf}tx-axis" value="0" step="1"/>
+      <input type="number" id="${pf}tx-axis" value="0" step="1" title="Index of the pivot note"/>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-complement" data-op="complement">
       <span class="drag-handle">⠿</span>
       <button class="op-toggle off${cls}" data-op="complement">off</button>
       <span class="step-name">Complement</span>
     </div>
-    <div class="chain-step off${stepCls}" id="${pf}card-mod" data-op="mod">
-      <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="mod">off</button>
-      <span class="step-name">Mod</span>
-      <input type="number" id="${pf}tx-mod" value="12" min="1" step="1"/>
-    </div>
     <div class="chain-step off${stepCls}" id="${pf}card-scale" data-op="scale">
       <span class="drag-handle">⠿</span>
       <button class="op-toggle off${cls}" data-op="scale">off</button>
       <span class="step-name">Multiply</span>
-      <input type="number" id="${pf}tx-mult" value="2" step="1"/>
+      <input type="number" id="${pf}tx-mult" value="2" step="1" title="Scale all note values by this factor"/>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-relmode" data-op="relmode">
       <span class="drag-handle">⠿</span>
       <button class="op-toggle off${cls}" data-op="relmode">off</button>
       <span class="step-name">Relative Mode</span>
-      <input type="number" id="${pf}tx-rt-off" value="0" step="1"/>
-      <input type="number" id="${pf}tx-rt-len" value="0" min="0" step="1"/>
+      <input type="number" id="${pf}tx-rt-off" value="0" step="1" title="Start position (negative wraps from end)"/>
+      <input type="number" id="${pf}tx-rt-len" value="0" min="0" step="1" title="How many notes to take (0 = same as input)"/>
+    </div>
+    <div class="chain-step off${stepCls}" id="${pf}card-resize" data-op="resize">
+      <span class="drag-handle">⠿</span>
+      <button class="op-toggle off${cls}" data-op="resize">off</button>
+      <span class="step-name">Resize</span>
+      <input type="number" id="${pf}tx-rs-start" value="0" step="1" title="First note index (wraps with octave scaling)"/>
+      <input type="number" id="${pf}tx-rs-end" value="3" step="1" title="Last note index (start > end reverses)"/>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-spread" data-op="spread">
       <span class="drag-handle">⠿</span>
       <button class="op-toggle off${cls}" data-op="spread">off</button>
       <span class="step-name">Spread</span>
       <label style="display:flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:9px;color:var(--text-dim);white-space:nowrap;cursor:pointer;user-select:none" title="Allow cluster at top">
-        <input type="checkbox" id="${pf}tx-sp-top" style="accent-color:var(--blue);cursor:pointer"/>top cluster
+        <input type="checkbox" id="${pf}tx-sp-top" style="accent-color:var(--blue);cursor:pointer" title="Allow tight clustering at the top"/>top cluster
       </label>
-    </div>`;
+    </div>`
 }
 
 function initChain(track){
@@ -2022,11 +2087,13 @@ function initChain(track){
     });
   });
 
-  ['tx-scalar','tx-axis','tx-mod','tx-mult','tx-rt-off','tx-rt-len'].forEach(id=>{
+  ['tx-scalar','tx-axis','tx-mod','tx-mult','tx-rt-off','tx-rt-len','tx-rs-start','tx-rs-end','tx-neg-axis'].forEach(id=>{
     const el=document.getElementById(pf+id); if(el) el.addEventListener('input',()=>runChain(track));
   });
   const spTopEl=document.getElementById(pf+'tx-sp-top');
   if(spTopEl) spTopEl.addEventListener('change',()=>runChain(track));
+  const negStdEl=document.getElementById(pf+'tx-neg-std');
+  if(negStdEl) negStdEl.addEventListener('change',()=>runChain(track));
 
   // Drag reorder
   let dragSrc=null, dragOver=null;
@@ -2280,7 +2347,7 @@ renderKbdStrip();
 // ═══════════════════════════════════════════════════════════
 //  THEME TOGGLE
 // ═══════════════════════════════════════════════════════════
-let currentTheme = 'dark';
+let currentTheme = 'light';
 document.getElementById('themeToggle').addEventListener('click', () => {
   currentTheme = currentTheme === 'light' ? 'dark' : 'light';
 
