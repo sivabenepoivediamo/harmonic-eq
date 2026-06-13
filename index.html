@@ -1507,25 +1507,12 @@ function opResize(arr,start,end){
   return out;
 }
 
-function opNegative(arr,axis,standard){
+function negative(arr,ax=0){
   if(!arr.length) return [];
-  // Subtract the lowest note, operate on the normalised set,
-  // then add it back so the result stays in the same octave region.
-  const anchor=Math.min(...arr);
-  let result=arr.map(v=>v-anchor);
-  let adj=axis;
-  // Step 1: double (standard mode)
-  if(standard){ result=result.map(v=>v*2); adj=axis*2-1; }
-  // Steps 2-4: mirror around adj
-  result=result.map(v=>adj-(v-adj));
-  // Step 5: halve (standard mode)
-  if(standard){ result=result.map(v=>v/2); }
-  // Step 6: sort
-  result.sort((a,b)=>a-b);
-  // Step 7: rotoTranslate(-1)
-  result=opRotoTranslate(result,-1,0);
-  // Shift back to original pitch region
-  return result.map(v=>v+anchor);
+  const firstVal=arr[0];
+  const inverted=opInvert(arr,ax);
+  const diff=firstVal-inverted[0];
+  return inverted.map(v=>v+diff);
 }
 
 function opParallelMode(arr,k){
@@ -1602,11 +1589,7 @@ function runChain(track){
         const s=getN(pf+'tx-rs-start'), e=getN(pf+'tx-rs-end');
         result=opResize(result,s,e);
       } break;
-      case 'negative': {
-        const ax=getN(pf+'tx-neg-axis');
-        const std=document.getElementById(pf+'tx-neg-std')?.checked!==false;
-        result=opNegative(result,ax,std);
-      } break;
+      case 'negative': result=negative(result); break;
     }
   }
   showResult(result,track);
@@ -2066,10 +2049,6 @@ function buildTransformHTML(pf,isScale){
       <span class="drag-handle">⠿</span>
       <button class="op-toggle off${cls}" data-op="negative">off</button>
       <span class="step-name">Negative</span>
-      <input type="number" id="${pf}tx-neg-axis" value="10" step="1" title="Pitch-class to mirror around (0–11)"/>
-      <label style="display:flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:9px;color:var(--text-dim);white-space:nowrap;cursor:pointer;user-select:none" title="Standard mode (×2 / ÷2)">
-        <input type="checkbox" id="${pf}tx-neg-std" checked style="accent-color:var(--blue);cursor:pointer" title="Use ×2/÷2 wrapping for half-step precision"/>standard
-      </label>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-spread" data-op="spread">
       <span class="drag-handle">⠿</span>
@@ -2106,13 +2085,11 @@ function initChain(track){
     });
   });
 
-  ['tx-scalar','tx-axis','tx-mod','tx-mult','tx-pm-k','tx-rt-off','tx-rt-len','tx-rs-start','tx-rs-end','tx-neg-axis'].forEach(id=>{
+  ['tx-scalar','tx-axis','tx-mod','tx-mult','tx-pm-k','tx-rt-off','tx-rt-len','tx-rs-start','tx-rs-end'].forEach(id=>{
     const el=document.getElementById(pf+id); if(el) el.addEventListener('input',()=>runChain(track));
   });
   const spTopEl=document.getElementById(pf+'tx-sp-top');
   if(spTopEl) spTopEl.addEventListener('change',()=>runChain(track));
-  const negStdEl=document.getElementById(pf+'tx-neg-std');
-  if(negStdEl) negStdEl.addEventListener('change',()=>runChain(track));
 
   // Drag reorder
   let dragSrc=null, dragOver=null;
