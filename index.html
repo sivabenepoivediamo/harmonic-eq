@@ -1251,8 +1251,8 @@ function makeTrack(id){
     notes:[],
     gains:{},
     qs:{},
-    enabled:{transpose:false,invert:false,complement:false,mod:false,scale:false,parmode:false,relmode:false,spread:false,resize:false,negative:false},
-    stepOrder:['mod','scale','transpose','invert','complement','parmode','relmode','negative','spread','resize'],
+    enabled:{transpose:false,invert:false,complement:false,mod:false,scale:false,parmode:false,relmode:false,spread:false,resize:false,mirror:false,negative:false},
+    stepOrder:['mod','scale','transpose','invert','complement','parmode','relmode','mirror','negative','spread','resize'],
     linkMode:'',
     _compactOverride:undefined,
     sliderMap:new Map(),
@@ -1507,12 +1507,42 @@ function opResize(arr,start,end){
   return out;
 }
 
-function negative(arr,ax=0){
+function mirror(arr,ax=0){
   if(!arr.length) return [];
   const firstVal=arr[0];
   const inverted=opInvert(arr,ax);
   const diff=firstVal-inverted[0];
   return inverted.map(v=>v+diff);
+}
+
+function gcd(a,b){ while(b!==0){const t=b;b=a%b;a=t;} return a; }
+
+function fifthGenerator(modulo,num,den){
+  const ideal=modulo*Math.log2(num/den);
+  let best=1, bestDist=1e18;
+  for(let g=1;g<modulo;++g){
+    if(gcd(g,modulo)!==1) continue;
+    const d=Math.abs(g-ideal);
+    if(d<bestDist){bestDist=d;best=g;}
+  }
+  return best;
+}
+
+function pmod(x,m){ return ((x%m)+m)%m; }
+
+function negativeHarmonyPitch(pitch,axis,modulo){
+  const pc=pmod(pitch,modulo);
+  const reflectedPc=pmod(axis-pc,modulo);
+  const octaveBase=pitch-pc;
+  return octaveBase+reflectedPc;
+}
+
+
+function negative(arr, axis){
+  if(!arr.length) return [];
+  const modulo = 12;
+  const out = arr.map(p => negativeHarmonyPitch(p, axis, modulo));
+  return out.sort((a,b) => a-b);
 }
 
 function opParallelMode(arr,k){
@@ -1589,7 +1619,13 @@ function runChain(track){
         const s=getN(pf+'tx-rs-start'), e=getN(pf+'tx-rs-end');
         result=opResize(result,s,e);
       } break;
-      case 'negative': result=negative(result); break;
+      case 'mirror':    result=mirror(result); break;
+      case 'negative': {
+        const rootEl = document.getElementById(pf+'tx-neg-root');
+        const root = rootEl ? (parseInt(rootEl.value) || 0) : 0;
+        const axis = pmod(root * 2 + 7, 12);
+        result = negative(result, axis);
+      } break;
     }
   }
   showResult(result,track);
@@ -2045,10 +2081,16 @@ function buildTransformHTML(pf,isScale){
       <input type="number" id="${pf}tx-rt-off" value="0" step="1" title="Start position (negative wraps from end)"/>
       <input type="number" id="${pf}tx-rt-len" value="0" min="0" step="1" title="How many notes to take (0 = same as input)"/>
     </div>
+    <div class="chain-step off${stepCls}" id="${pf}card-mirror" data-op="mirror">
+      <span class="drag-handle">⠿</span>
+      <button class="op-toggle off${cls}" data-op="mirror">off</button>
+      <span class="step-name">Mirror</span>
+    </div>
     <div class="chain-step off${stepCls}" id="${pf}card-negative" data-op="negative">
       <span class="drag-handle">⠿</span>
       <button class="op-toggle off${cls}" data-op="negative">off</button>
       <span class="step-name">Negative</span>
+      <input type="number" id="${pf}tx-neg-root" value="0" step="1" title="Root pitch class (0–11). Axis = (root × 2 + 7) mod 12"/>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-spread" data-op="spread">
       <span class="drag-handle">⠿</span>
@@ -2085,7 +2127,7 @@ function initChain(track){
     });
   });
 
-  ['tx-scalar','tx-axis','tx-mod','tx-mult','tx-pm-k','tx-rt-off','tx-rt-len','tx-rs-start','tx-rs-end'].forEach(id=>{
+  ['tx-scalar','tx-axis','tx-mod','tx-mult','tx-pm-k','tx-rt-off','tx-rt-len','tx-rs-start','tx-rs-end','tx-neg-root'].forEach(id=>{
     const el=document.getElementById(pf+id); if(el) el.addEventListener('input',()=>runChain(track));
   });
   const spTopEl=document.getElementById(pf+'tx-sp-top');
