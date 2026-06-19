@@ -184,7 +184,7 @@ Shifts every note up or down by a fixed number of semitones. Positive = up, nega
 ### Invert
 Mirrors the note set around one of its own notes. The number field sets which note is the mirror point (0 = lowest note, 1 = second lowest, etc.).
 
-*Example: a C major chord inverted around index 0 (C) gives the same intervals flipped downward.*
+*Example: a C major chord inverted around index 0 (C) gives F minor, a chord with the same intervals flipped downward.*
 
 ---
 
@@ -196,28 +196,28 @@ Replaces the note set with all the notes that are **not** in it, within the same
 ### Parallel Mode
 Derives a mode of the note set by rotating the interval pattern to start from a different scale degree. The **k** field selects which degree to use as the new root (0 = no change, 1 = start from the second note, etc.). The output always has the same number of notes as the input and is anchored to the same pitch region.
 
-*Example: a C major triad [C, E, G] at k=1 gives the intervals measured from E: [E, G, C] — a minor third up, then a perfect fourth.*
+*Example: a C major triad [C, E, G] at k=1 gives the intervals measured from E: [C, Eb, Ab] — a minor third up, then a perfect fourth.*
 
 ---
 
 ### Relative Mode
 Rotates through the note set starting at a given offset and reads out a given number of notes, wrapping and extending upward by an automatically calculated period for each cycle. The two fields are **offset** (which note to start from) and **length** (how many notes to output; 0 means same as input count).
 
-*This is how you derive modes from a scale — rotating a major scale by 1 gives Dorian, by 2 gives Phrygian, etc.*
+*This is how you derive modes from a scale — rotating a C major scale by 1 gives D Dorian, by 2 gives E Phrygian, etc.*
 
 ---
 
 ### Mirror
 Reflects the note set so that its interval structure is flipped upside-down, keeping the lowest note in place. The result has the same outer span but the intervals run in reverse order from the bottom.
 
-*Example: a major triad [C, E, G] mirrored becomes [C, Ab, F] — the major third and minor third swap direction.*
+*Example: a major triad [C, E, G] mirrored becomes [C, Eb, G] — the major third and minor third swap direction.*
 
 ---
 
 ### Negative
 Applies the canonical harmonic negation of the note set. Each note is reflected around a pitch-class axis derived from the **root** field: axis = (root × 2 + 7) mod 12. With the default root of 0 the axis is 7 (G), which corresponds to the circle-of-fifths reflection used in traditional negative harmony. Octave register is preserved note-by-note. Output is sorted ascending.
 
-*Example: a C major triad negated at root 0 produces an F minor triad — its harmonic mirror in the key of C.*
+*Example: a D minor triad negated at root 0 produces a Bb major triad — its harmonic negative in the key of C.*
 
 ---
 
