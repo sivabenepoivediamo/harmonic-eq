@@ -156,7 +156,7 @@ Two rows of the keyboard map to two chromatic octaves:
 
 Each track has its own chain of operations that can reshape the note set before it reaches the EQ bands. Operations are toggled on/off individually and can be reordered by dragging the `⠿` handle. They run top-to-bottom in the order shown.
 
-The default order is: **Mod → Multiply → Transpose → Invert → Complement → Parallel Mode → Relative Mode → Negative → Spread → Resize.**
+The default order is: **Mod → Multiply → Transpose → Invert → Complement → Parallel Mode → Relative Mode → Mirror → Negative → Close → Spread → Resize.**
 
 ---
 
@@ -207,10 +207,24 @@ Rotates through the note set starting at a given offset and reads out a given nu
 
 ---
 
-### Negative
-Applies the harmonic negation of the note set around a pitch-class axis. The **axis** field sets the reflection point (0–11). The **standard** checkbox enables the canonical ×2/÷2 transform that gives half-step resolution; unchecking it mirrors directly around the raw axis value. The result is kept in the same octave region as the input.
+### Mirror
+Reflects the note set so that its interval structure is flipped upside-down, keeping the lowest note in place. The result has the same outer span but the intervals run in reverse order from the bottom.
 
-*Example: a major triad negated around axis 10 (B♭) produces its harmonic mirror — a minor triad with the same quality but reflected interval structure.*
+*Example: a major triad [C, E, G] mirrored becomes [C, Ab, F] — the major third and minor third swap direction.*
+
+---
+
+### Negative
+Applies the canonical harmonic negation of the note set. Each note is reflected around a pitch-class axis derived from the **root** field: axis = (root × 2 + 7) mod 12. With the default root of 0 the axis is 7 (G), which corresponds to the circle-of-fifths reflection used in traditional negative harmony. Octave register is preserved note-by-note. Output is sorted ascending.
+
+*Example: a C major triad negated at root 0 produces an F minor triad — its harmonic mirror in the key of C.*
+
+---
+
+### Close
+Folds all notes into a single octave, like Mod, but instead of always landing in octave 0 it uses whichever octave already contains the most notes from the original set. Duplicates (after folding) are removed. Output is sorted ascending.
+
+*Example: notes spread across three octaves collapse into the octave where most of them were already clustered.*
 
 ---
 
