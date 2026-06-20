@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1255,6 +1256,8 @@ function makeTrack(id){
     stepOrder:['mod','scale','transpose','invert','complement','parmode','relmode','mirror','negative','close','spread','resize'],
     linkMode:'',
     _compactOverride:undefined,
+    _pendingGains:null,
+    _pendingQs:null,
     sliderMap:new Map(),
     filterNodes:new Map(),
   };
@@ -1406,25 +1409,30 @@ function applyScale(name,intervals){
   for(const[k,v] of Object.entries(oldGains)){ const pc=((parseInt(k)%12)+12)%12; if(pcGains[pc]===undefined) pcGains[pc]=v; }
   for(const[k,v] of Object.entries(oldQs)){ const pc=((parseInt(k)%12)+12)%12; if(pcQs[pc]===undefined) pcQs[pc]=v; }
   const sorted=[...midiNotes].sort((a,b)=>a-b);
-  scaleTrack.gains={}; scaleTrack.qs={};
+  const pendingGains={}, pendingQs={};
   const isNew={};
   for(const n of sorted){
     const pc=((n%12)+12)%12;
-    scaleTrack.gains[n]=oldGains[n]!==undefined?oldGains[n]:pcGains[pc]!==undefined?pcGains[pc]:null;
-    scaleTrack.qs[n]=oldQs[n]!==undefined?oldQs[n]:pcQs[pc]!==undefined?pcQs[pc]:null;
-    isNew[n]=scaleTrack.gains[n]===null;
+    pendingGains[n]=oldGains[n]!==undefined?oldGains[n]:pcGains[pc]!==undefined?pcGains[pc]:null;
+    pendingQs[n]=oldQs[n]!==undefined?oldQs[n]:pcQs[pc]!==undefined?pcQs[pc]:null;
+    isNew[n]=pendingGains[n]===null;
   }
   for(let i=0;i<sorted.length;i++){
     const n=sorted[i]; if(!isNew[n]) continue;
     let prevG=null,prevQ=null;
-    for(let j=i-1;j>=0;j--){ if(!isNew[sorted[j]]){ prevG=scaleTrack.gains[sorted[j]]; prevQ=scaleTrack.qs[sorted[j]]; break; } }
+    for(let j=i-1;j>=0;j--){ if(!isNew[sorted[j]]){ prevG=pendingGains[sorted[j]]; prevQ=pendingQs[sorted[j]]; break; } }
     let nextG=null,nextQ=null;
-    for(let j=i+1;j<sorted.length;j++){ if(!isNew[sorted[j]]){ nextG=scaleTrack.gains[sorted[j]]; nextQ=scaleTrack.qs[sorted[j]]; break; } }
-    if(prevG!==null&&nextG!==null){ scaleTrack.gains[n]=Math.round((prevG+nextG)/2); scaleTrack.qs[n]=Math.round((prevQ+nextQ)/2); }
-    else if(prevG!==null){ scaleTrack.gains[n]=prevG; scaleTrack.qs[n]=prevQ; }
-    else if(nextG!==null){ scaleTrack.gains[n]=nextG; scaleTrack.qs[n]=nextQ; }
-    else { scaleTrack.gains[n]=0; scaleTrack.qs[n]=30; }
+    for(let j=i+1;j<sorted.length;j++){ if(!isNew[sorted[j]]){ nextG=pendingGains[sorted[j]]; nextQ=pendingQs[sorted[j]]; break; } }
+    if(prevG!==null&&nextG!==null){ pendingGains[n]=Math.round((prevG+nextG)/2); pendingQs[n]=Math.round((prevQ+nextQ)/2); }
+    else if(prevG!==null){ pendingGains[n]=prevG; pendingQs[n]=prevQ; }
+    else if(nextG!==null){ pendingGains[n]=nextG; pendingQs[n]=nextQ; }
+    else { pendingGains[n]=0; pendingQs[n]=30; }
   }
+  // Stash the propagated values so showResult picks them up instead of resetting to defaults
+  scaleTrack._pendingGains=pendingGains;
+  scaleTrack._pendingQs=pendingQs;
+  scaleTrack.gains=Object.assign({},pendingGains);
+  scaleTrack.qs=Object.assign({},pendingQs);
   scaleTrack.source=[...midiNotes];
   scaleTrack.baseNotes=[...midiNotes];
   runChain(scaleTrack);
@@ -1660,11 +1668,18 @@ function runChain(track){
 
 function showResult(result,track){
   const prev=[...track.notes], oldG={...track.gains}, oldQ={...track.qs};
+  // Consume any propagated gains stashed by applyScale (scale-switch path)
+  const pendingG=track._pendingGains||null;
+  const pendingQ=track._pendingQs||null;
+  track._pendingGains=null; track._pendingQs=null;
   track.gains={}; track.qs={};
   track.notes=result.filter(v=>Number.isFinite(v));
   for(let i=0;i<track.notes.length;i++){
     const n=track.notes[i];
-    if(oldG[n]!==undefined){ track.gains[n]=oldG[n]; track.qs[n]=oldQ[n]; }
+    if(pendingG&&pendingG[n]!==undefined){
+      // Use the pre-propagated value from applyScale (preserves user's settings across scale changes)
+      track.gains[n]=pendingG[n]; track.qs[n]=pendingQ[n];
+    } else if(oldG[n]!==undefined){ track.gains[n]=oldG[n]; track.qs[n]=oldQ[n]; }
     else if(prev.length){ const d=prev[i%prev.length]; track.gains[n]=oldG[d]!==undefined?oldG[d]:0; track.qs[n]=oldQ[d]!==undefined?oldQ[d]:30; }
     else { track.gains[n]=0; track.qs[n]=30; }
   }
