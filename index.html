@@ -1354,6 +1354,7 @@ const SCALE_LIBRARY = [
     ["Symmetrical Nonatonic",   [0,1,2,4,6,7,8,10,11]],
   ]},
 ];
+
 // ═══════════════════════════════════════════════════════════
 //  CONSTANTS
 // ═══════════════════════════════════════════════════════════
@@ -1788,6 +1789,7 @@ function runChain(track){
   const pf=track.id+'-';
   let result=[...track.baseNotes];
   track._spreadPreG=null; track._spreadPreQ=null;
+  track._parmodePreG=null; track._parmodePreQ=null;
   for(const op of track.stepOrder){
     if(!track.enabled[op]) continue;
     switch(op){
@@ -1797,7 +1799,19 @@ function runChain(track){
       case 'mod':        result=opMod(result,Math.max(1,getN(pf+'tx-mod'))); break;
       case 'close':      result=opClose(result); break;
       case 'scale':      { const s=getN(pf+'tx-mult'); if(s!==0) result=opScaleMult(result,s); } break;
-      case 'parmode':    result=opParallelMode(result,getN(pf+'tx-pm-k')); break;
+      case 'parmode':    {
+        const pmK=getN(pf+'tx-pm-k');
+        const preG={}, preQ={};
+        for(const n of result){
+          const pc=((n%12)+12)%12;
+          if(preG[pc]===undefined){
+            preG[pc]=track.gains[n]!==undefined?track.gains[n]:(track.gainMemory[n]!==undefined?track.gainMemory[n]:0);
+            preQ[pc]=track.qs[n]!==undefined?track.qs[n]:(track.qMemory[n]!==undefined?track.qMemory[n]:30);
+          }
+        }
+        track._parmodePreG=preG; track._parmodePreQ=preQ;
+        result=opParallelMode(result,pmK);
+      } break;
       case 'relmode':    result=opRotoTranslate(result,getN(pf+'tx-rt-off'),Math.max(0,getN(pf+'tx-rt-len'))); break;
       case 'spread': {
         const allowTop=document.getElementById(pf+'tx-sp-top')?.checked||false;
@@ -1840,6 +1854,10 @@ function showResult(result,track){
   const spreadG=track._spreadPreG||null;
   const spreadQ=track._spreadPreQ||null;
   track._spreadPreG=null; track._spreadPreQ=null;
+  // Consume pre-parmode pitch-class snapshot (parallel mode path)
+  const parmodeG=track._parmodePreG||null;
+  const parmodeQ=track._parmodePreQ||null;
+  track._parmodePreG=null; track._parmodePreQ=null;
   // Pitch-class fallback, drawn from the full persistent memory (not just the
   // currently active notes) so a brand-new note can still inherit a sensible
   // value even if its pitch class isn't active right now.
@@ -1857,6 +1875,9 @@ function showResult(result,track){
     } else if(spreadG&&spreadG[pc]!==undefined){
       // Spread remapped this note to a new octave — restore gain/Q from the pre-spread pitch-class snapshot
       g=spreadG[pc]; q=spreadQ[pc]!==undefined?spreadQ[pc]:30;
+    } else if(parmodeG&&parmodeG[pc]!==undefined){
+      // Parallel mode rotated this note to a new octave — restore from pre-parmode pitch-class snapshot
+      g=parmodeG[pc]; q=parmodeQ[pc]!==undefined?parmodeQ[pc]:30;
     } else if(track.gainMemory[n]!==undefined){
       // This exact note has been seen before — e.g. Resize/Relative Mode shrank
       // it out of the active set and it's now being expanded back in. Restore
