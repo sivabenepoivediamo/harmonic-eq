@@ -1,6 +1,5 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -39,33 +38,37 @@
   --gap: 14px;
 }
 [data-theme="dark"] {
-  /* Accent colors — identical to light mode so highlights look the same */
-  --blue: #1a56db;
-  --blue-mid: #3b82f6;
-  --blue-light: #172554;
-  --blue-faint: #0f172a;
-  --amber: #d97706;
-  --amber-mid: #f59e0b;
-  --amber-light: #271900;
-  --red: #dc2626;
-  --red-light: #1f0707;
-  --green: #16a34a;
-  --green-mid: #22c55e;
-  --green-light: #052e10;
-  --violet: #7c3aed;
-  --violet-mid: #8b5cf6;
-  --violet-light: #1e1040;
-  --violet-faint: #160b30;
-  /* Surfaces, borders, text — go dark */
-  --surface: #1c1c1c;
-  --surface-secondary: #141414;
-  --surface-plot: #111111;
+  /* Primary accent → neutral gray (onde style) */
+  --blue: #c8c8c8;
+  --blue-mid: #a0a0a0;
+  --blue-light: #222222;
+  --blue-faint: #1a1a1a;
+  /* Amber → warm desaturated */
+  --amber: #b8a060;
+  --amber-mid: #c8b070;
+  --amber-light: #1e1a0f;
+  /* Red → muted */
+  --red: #b87070;
+  --red-light: #1a0f0f;
+  /* Green → muted */
+  --green: #609060;
+  --green-mid: #709870;
+  --green-light: #0f1a0f;
+  /* Violet → desaturated, barely tinted gray */
+  --violet: #a898c8;
+  --violet-mid: #b8a8d8;
+  --violet-light: #1e1a2a;
+  --violet-faint: #181520;
+  /* Surfaces, borders, text — onde exact values */
+  --surface: #181818;
+  --surface-secondary: #111111;
+  --surface-plot: #141414;
   --body-bg: #0a0a0a;
-  --border: #2e2e2e;
-  --border-strong: #404040;
-  --text: #e2e2e2;
-  --text-mid: #8a8a8a;
-  --text-dim: #4a4a4a;
+  --border: #2a2a2a;
+  --border-strong: #3a3a3a;
+  --text: #e8e8e8;
+  --text-mid: #999999;
+  --text-dim: #555555;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { background: var(--body-bg, #e8edf4); }
@@ -133,8 +136,8 @@ button {
   transition: border-color .1s, color .1s, background .1s;
 }
 button:hover { border-color: var(--blue-mid); color: var(--blue); background: var(--blue-faint); }
-#set-btn { background: var(--blue); border-color: var(--blue); color: #fff; }
-#set-btn:hover { background: var(--blue-mid); border-color: var(--blue-mid); color: #fff; }
+#set-btn { background: var(--blue-light); border-color: var(--blue-mid); color: var(--blue); }
+#set-btn:hover { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
 #clear-btn:hover { border-color: var(--red); color: var(--red); background: var(--red-light); }
 
 input[type=number] {
@@ -184,8 +187,8 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
   cursor: pointer; transition: all .1s;
 }
 .src-btn:hover { border-color: var(--blue-mid); color: var(--blue); background: var(--blue-faint); }
-.src-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
-.src-btn.active:hover { background: var(--blue-mid); border-color: var(--blue-mid); }
+.src-btn.active { background: var(--blue-light); border-color: var(--blue-mid); color: var(--blue); }
+.src-btn.active:hover { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
 .vol-group { display: flex; align-items: center; gap: 6px; margin-left: auto; }
 .vol-slider { width: 80px; accent-color: var(--blue); cursor: pointer; }
 .vol-pct { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); min-width: 32px; }
@@ -287,16 +290,18 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
 }
 /* White key states */
 .pk-white.in-range .pk-label { color: rgba(59,130,246,.5); }
-.pk-white.band-on  { background: linear-gradient(to bottom,#dbeafe,#bfdbfe); border-color: var(--blue-mid); box-shadow: 0 2px 8px rgba(59,130,246,.25), inset 0 -1px 0 rgba(59,130,246,.2); }
+.pk-white.band-on  { background: #bfdbfe; border-color: var(--blue-mid); box-shadow: 0 2px 8px rgba(59,130,246,.25); }
 .pk-white.band-on .pk-label  { color: var(--blue); font-weight: 500; }
-.pk-white.scale-on { background: linear-gradient(to bottom,#ede9fe,#ddd6fe); border-color: var(--violet-mid); box-shadow: 0 2px 8px rgba(139,92,246,.25), inset 0 -1px 0 rgba(139,92,246,.2); }
-.pk-white.scale-on .pk-label { color: var(--violet); font-weight: 500; }
-.pk-white.band-both { background: linear-gradient(to bottom,#dcfce7,#bbf7d0); border-color: var(--green-mid); box-shadow: 0 2px 8px rgba(34,197,94,.25); }
+.pk-white.scale-on { background: #a78bfa; border-color: #7c3aed; box-shadow: 0 2px 10px rgba(139,92,246,.4); }
+.pk-white.scale-on .pk-label { color: #3b0764; font-weight: 700; }
+.pk-white.scale-pc { background: #ddd6fe; border-color: #c4b5fd; box-shadow: none; }
+.pk-white.scale-pc .pk-label { color: #7c3aed; font-weight: 400; }
+.pk-white.band-both { background: #bbf7d0; border-color: var(--green-mid); box-shadow: 0 2px 8px rgba(34,197,94,.25); }
 .pk-white.band-both .pk-label { color: var(--green); font-weight: 500; }
-.pk-white.held { background: linear-gradient(to bottom,#fef3c7,#fcd34d); border-color: var(--amber-mid); box-shadow: 0 2px 8px rgba(217,119,6,.35); animation: pulse-key .5s ease-in-out infinite alternate; }
+.pk-white.held { background: #fcd34d; border-color: var(--amber-mid); box-shadow: 0 2px 8px rgba(217,119,6,.35); animation: pulse-key .5s ease-in-out infinite alternate; }
 .pk-white.held .pk-label { color: var(--amber); font-weight: 500; }
 /* Active (pressed) */
-.pk-white:active, .pk-white.pressing { background: linear-gradient(to bottom,#dbeafe,#93c5fd); box-shadow: 0 1px 2px rgba(0,0,0,.1); }
+.pk-white:active, .pk-white.pressing { background: #93c5fd; box-shadow: 0 1px 2px rgba(0,0,0,.1); }
 
 /* Black keys */
 .pk-black {
@@ -326,15 +331,17 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
   pointer-events: none;
 }
 /* Black key states */
-.pk-black.band-on  { background: linear-gradient(to bottom,#1e40af,#1d4ed8,#1e3a8a); border-color: #60a5fa; box-shadow: 2px 3px 8px rgba(59,130,246,.5), inset 0 -2px 0 rgba(255,255,255,.15); }
+.pk-black.band-on  { background: #1d4ed8; border-color: #60a5fa; box-shadow: 2px 3px 8px rgba(59,130,246,.5); }
 .pk-black.band-on .pk-label  { color: #bfdbfe; }
-.pk-black.scale-on { background: linear-gradient(to bottom,#5b21b6,#6d28d9,#4c1d95); border-color: #a78bfa; box-shadow: 2px 3px 8px rgba(139,92,246,.5), inset 0 -2px 0 rgba(255,255,255,.15); }
-.pk-black.scale-on .pk-label { color: #ddd6fe; }
-.pk-black.band-both { background: linear-gradient(to bottom,#14532d,#166534,#052e16); border-color: #4ade80; box-shadow: 2px 3px 8px rgba(34,197,94,.45); }
+.pk-black.scale-on { background: #7c3aed; border-color: #c4b5fd; box-shadow: 2px 3px 12px rgba(139,92,246,.7); }
+.pk-black.scale-on .pk-label { color: #ede9fe; font-weight: 600; }
+.pk-black.scale-pc { background: #4c1d95; border-color: #7c6abf; box-shadow: none; }
+.pk-black.scale-pc .pk-label { color: #c4b5fd; font-weight: 400; }
+.pk-black.band-both { background: #166534; border-color: #4ade80; box-shadow: 2px 3px 8px rgba(34,197,94,.45); }
 .pk-black.band-both .pk-label { color: #bbf7d0; }
-.pk-black.held { background: linear-gradient(to bottom,#92400e,#b45309,#78350f); border-color: #fcd34d; box-shadow: 2px 3px 8px rgba(217,119,6,.5); animation: pulse-key .5s ease-in-out infinite alternate; }
+.pk-black.held { background: #b45309; border-color: #fcd34d; box-shadow: 2px 3px 8px rgba(217,119,6,.5); animation: pulse-key .5s ease-in-out infinite alternate; }
 .pk-black.held .pk-label { color: #fef3c7; }
-.pk-black:active, .pk-black.pressing { background: linear-gradient(to bottom,#1e3a6e,#1e40af); box-shadow: 1px 2px 3px rgba(0,0,0,.5); }
+.pk-black:active, .pk-black.pressing { background: #1e40af; box-shadow: 1px 2px 3px rgba(0,0,0,.5); }
 
 @keyframes pulse-key { from{opacity:.75} to{opacity:1} }
 
@@ -376,9 +383,9 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
 }
 .rp-white:last-child { margin-right: 0; }
 .rp-white .rp-label { font-family: var(--font-mono); font-size: 8px; color: rgba(0,0,0,.28); pointer-events: none; line-height: 1; }
-.rp-white:hover { background: linear-gradient(to bottom,#f0e9ff,#ede9fe 60%); border-color: var(--violet-mid); }
-.rp-white.active { background: linear-gradient(to bottom,#7c3aed,#6d28d9); border-color: #5b21b6; box-shadow: 0 2px 8px rgba(124,58,237,.4); }
-.rp-white.active .rp-label { color: #fff; font-weight: 500; }
+.rp-white:hover { background: #ede9fe; border-color: var(--violet-mid); }
+.rp-white.active { background: #a78bfa; border-color: #7c3aed; box-shadow: 0 2px 8px rgba(139,92,246,.3); }
+.rp-white.active .rp-label { color: #3b0764; font-weight: 600; }
 .rp-black {
   position: absolute;
   width: 16px;
@@ -397,9 +404,9 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
   transition: background .08s;
 }
 .rp-black .rp-label { font-family: var(--font-mono); font-size: 7px; color: rgba(255,255,255,.25); pointer-events: none; line-height: 1; }
-.rp-black:hover { background: linear-gradient(to bottom,#4c1d95,#5b21b6 70%,#3b0764); border-color: var(--violet-mid); }
-.rp-black.active { background: linear-gradient(to bottom,#7c3aed,#6d28d9,#4c1d95); border-color: #a78bfa; box-shadow: 1px 2px 8px rgba(124,58,237,.5); }
-.rp-black.active .rp-label { color: #ddd6fe; }
+.rp-black:hover { background: #3a2d52; border-color: var(--violet-mid); }
+.rp-black.active { background: #6d28d9; border-color: #c4b5fd; box-shadow: 1px 2px 8px rgba(139,92,246,.5); }
+.rp-black.active .rp-label { color: #ede9fe; }
 
 /* ── Bands ───────────────────────────────────────────────── */
 .bands-header { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
@@ -571,11 +578,12 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
 .scale-folder.open .scale-folder-body { display: flex; }
 .scale-folders.searching .scale-folder:not(.search-hidden) .scale-folder-body { display: flex; }
 .scale-folder.search-hidden { display: none; }
-.scale-pill { font-family: var(--font-mono); font-size: 9px; letter-spacing: .03em; padding: 4px 9px; border-radius: 3px; cursor: pointer; border: 1px solid rgba(124,58,237,.2); background: var(--surface); color: var(--text-mid); transition: all .1s; white-space: nowrap; }
-.scale-pill:hover { background: var(--violet); border-color: var(--violet); color: #fff; }
+.scale-pill { font-family: var(--font-mono); font-size: 9px; letter-spacing: .03em; padding: 4px 9px; border-radius: 3px; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text-dim); transition: all .1s; white-space: nowrap; }
+.scale-pill:hover { border-color: var(--violet-mid); color: var(--violet); background: var(--violet-faint); }
 .scale-pill.active { background: var(--violet); border-color: var(--violet); color: #fff; }
-.scale-pill.search-match { border-color: var(--violet); color: var(--violet); }
-.scale-pill.search-match:hover,
+.scale-pill.active:hover { background: var(--violet-mid); border-color: var(--violet-mid); }
+.scale-pill.search-match { border-color: var(--violet-mid); color: var(--violet); }
+.scale-pill.search-match:hover { color: var(--violet); }
 .scale-pill.active.search-match { color: #fff; }
 .scale-pill.search-hidden { display: none; }
 .active-scale-row { margin-top: 10px; display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--violet-light); border: 1px solid var(--violet); border-radius: 4px; min-height: 30px; }
@@ -602,7 +610,20 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
 }
 .theme-btn:hover { color: var(--text); border-color: var(--border-strong); background: none; }
 
-/* ── Dark mode overrides ── */
+/* Selected scale pill: dark mode's --violet token is a pale lavender
+   meant for text/borders, not a solid fill (white text on it fails
+   contrast and reads as too bright). Use the deeper, glow-palette
+   violet instead — same hue family, readable white text. */
+[data-theme="dark"] .scale-pill.active { background: var(--key-scale-fill); border-color: var(--key-scale-border); }
+[data-theme="dark"] .scale-pill.active:hover { background: var(--key-scale-fill-hi); border-color: var(--key-scale-border); }
+
+/* Kill the hover fade on piano keys in dark mode — the lingering
+   transition made the hover color visibly persist for a moment after
+   the mouse left the key. Light mode keeps its original smooth fade. */
+[data-theme="dark"] .pk-white,
+[data-theme="dark"] .pk-black,
+[data-theme="dark"] .rp-white,
+[data-theme="dark"] .rp-black { transition: none; }
 
 /* Panel labels: uniform dim, no color accents */
 [data-theme="dark"] .panel-label,
@@ -621,6 +642,33 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
   box-shadow: 0 0 0 1.5px var(--border-strong) !important;
 }
 
+/* Shared dark-mode key highlight palette — used identically by both
+   the root-selector keyboard (.rp-*) and the MIDI input keyboard (.pk-*) */
+[data-theme="dark"] {
+  --key-band-fill: #3b6fd6;
+  --key-band-fill-hi: #5a8ce8;
+  --key-band-border: #6fa3ed;
+  --key-band-glow: rgba(59,130,246,.55);
+
+  --key-scale-fill: #8b5cf6;
+  --key-scale-fill-hi: #a78bfa;
+  --key-scale-border: #c4b5fd;
+  --key-scale-glow: rgba(139,92,246,.75);
+  --key-scale-pc-fill: #c8bce0;
+  --key-scale-pc-fill-hi: #d4c8ea;
+  --key-scale-pc-border: #a090c8;
+
+  --key-both-fill: #1d9b4c;
+  --key-both-fill-hi: #2bb860;
+  --key-both-border: #48c977;
+  --key-both-glow: rgba(34,197,94,.5);
+
+  --key-held-fill: #d99a14;
+  --key-held-fill-hi: #eaad2c;
+  --key-held-border: #f5b730;
+  --key-held-glow: rgba(245,158,11,.6);
+}
+
 /* White piano keys: ivory base */
 [data-theme="dark"] .pk-white,
 [data-theme="dark"] .rp-white {
@@ -629,22 +677,46 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
   box-shadow: none;
 }
 [data-theme="dark"] .pk-white .pk-label { color: rgba(0,0,0,.3); }
-[data-theme="dark"] .pk-white:hover { background: linear-gradient(to bottom,#e8f0ff,#dbeafe 60%); border-color: var(--blue-mid); }
-[data-theme="dark"] .pk-white.in-range .pk-label { color: rgba(59,130,246,.5); }
-[data-theme="dark"] .pk-white.band-on  { background: linear-gradient(to bottom,#dbeafe,#bfdbfe); border-color: var(--blue-mid); box-shadow: 0 2px 8px rgba(59,130,246,.25), inset 0 -1px 0 rgba(59,130,246,.2); }
-[data-theme="dark"] .pk-white.band-on .pk-label  { color: var(--blue); font-weight: 500; }
-[data-theme="dark"] .pk-white.scale-on { background: linear-gradient(to bottom,#ede9fe,#ddd6fe); border-color: var(--violet-mid); box-shadow: 0 2px 8px rgba(139,92,246,.25), inset 0 -1px 0 rgba(139,92,246,.2); }
-[data-theme="dark"] .pk-white.scale-on .pk-label { color: var(--violet); font-weight: 500; }
-[data-theme="dark"] .pk-white.band-both { background: linear-gradient(to bottom,#dcfce7,#bbf7d0); border-color: var(--green-mid); box-shadow: 0 2px 8px rgba(34,197,94,.25); }
-[data-theme="dark"] .pk-white.band-both .pk-label { color: var(--green); font-weight: 500; }
-[data-theme="dark"] .pk-white.held { background: linear-gradient(to bottom,#fef3c7,#fcd34d); border-color: var(--amber-mid); box-shadow: 0 2px 8px rgba(217,119,6,.35); }
-[data-theme="dark"] .pk-white.held .pk-label { color: var(--amber); font-weight: 500; }
-[data-theme="dark"] .pk-white:active, [data-theme="dark"] .pk-white.pressing { background: linear-gradient(to bottom,#dbeafe,#93c5fd); box-shadow: none; }
+[data-theme="dark"] .pk-white.in-range .pk-label { color: rgba(100,100,100,.5); }
+
+[data-theme="dark"] .pk-white.band-on {
+  background: var(--key-band-fill); border-color: var(--key-band-border);
+  box-shadow: 0 2px 9px var(--key-band-glow);
+}
+[data-theme="dark"] .pk-white.scale-on {
+  background: var(--key-scale-fill); border-color: var(--key-scale-border);
+  box-shadow: 0 2px 9px var(--key-scale-glow);
+}
+[data-theme="dark"] .pk-white.scale-pc {
+  background: var(--key-scale-pc-fill); border-color: var(--key-scale-pc-border);
+  box-shadow: none;
+}
+[data-theme="dark"] .pk-white.band-both {
+  background: var(--key-both-fill); border-color: var(--key-both-border);
+  box-shadow: 0 2px 9px var(--key-both-glow);
+}
+[data-theme="dark"] .pk-white.held {
+  background: var(--key-held-fill); border-color: var(--key-held-border);
+  box-shadow: 0 2px 10px var(--key-held-glow);
+  animation: pulse-key .5s ease-in-out infinite alternate;
+}
+[data-theme="dark"] .pk-white.band-on .pk-label,
+[data-theme="dark"] .pk-white.scale-on .pk-label,
+[data-theme="dark"] .pk-white.band-both .pk-label,
+[data-theme="dark"] .pk-white.held .pk-label { color: #fff; font-weight: 600; }
+[data-theme="dark"] .pk-white.scale-pc .pk-label { color: #6d28d9; font-weight: 400; }
+[data-theme="dark"] .pk-white:active, [data-theme="dark"] .pk-white.pressing { background: #b8c4e0; box-shadow: none; }
 
 [data-theme="dark"] .rp-white .rp-label { color: rgba(0,0,0,.3); }
-[data-theme="dark"] .rp-white:hover { background: linear-gradient(to bottom,#f0e9ff,#ede9fe 60%); border-color: var(--violet-mid); }
-[data-theme="dark"] .rp-white.active { background: linear-gradient(to bottom,#7c3aed,#6d28d9); border-color: #5b21b6; box-shadow: 0 2px 8px rgba(124,58,237,.4); }
-[data-theme="dark"] .rp-white.active .rp-label { color: #fff; font-weight: 500; }
+[data-theme="dark"] .rp-white:hover:not(.active) { background: #cfc0ec; border-color: var(--violet-mid); }
+/* Root key uses the same fill as "scale" highlight everywhere else, since
+   the root is conceptually part of the active scale. */
+[data-theme="dark"] .rp-white.active {
+  background: var(--key-scale-fill); border-color: var(--key-scale-border);
+  box-shadow: 0 2px 9px var(--key-scale-glow);
+}
+[data-theme="dark"] .rp-white.active:hover { background: var(--key-scale-fill-hi); }
+[data-theme="dark"] .rp-white.active .rp-label { color: #fff; font-weight: 600; }
 [data-theme="dark"] .piano-oct-label { color: rgba(0,0,0,.22); }
 
 /* Black piano keys: near-black base */
@@ -655,25 +727,76 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
   box-shadow: none;
 }
 [data-theme="dark"] .pk-black .pk-label { color: rgba(255,255,255,.28); }
-[data-theme="dark"] .pk-black:hover { background: linear-gradient(to bottom,#3b4a6b,#2d3a57 70%,#1e2a42 100%); border-color: var(--blue-mid); }
-[data-theme="dark"] .pk-black.band-on  { background: linear-gradient(to bottom,#1e40af,#1d4ed8,#1e3a8a); border-color: #60a5fa; box-shadow: 2px 3px 8px rgba(59,130,246,.5), inset 0 -2px 0 rgba(255,255,255,.15); }
-[data-theme="dark"] .pk-black.band-on .pk-label  { color: #bfdbfe; }
-[data-theme="dark"] .pk-black.scale-on { background: linear-gradient(to bottom,#5b21b6,#6d28d9,#4c1d95); border-color: #a78bfa; box-shadow: 2px 3px 8px rgba(139,92,246,.5), inset 0 -2px 0 rgba(255,255,255,.15); }
-[data-theme="dark"] .pk-black.scale-on .pk-label { color: #ddd6fe; }
-[data-theme="dark"] .pk-black.band-both { background: linear-gradient(to bottom,#14532d,#166534,#052e16); border-color: #4ade80; box-shadow: 2px 3px 8px rgba(34,197,94,.45); }
-[data-theme="dark"] .pk-black.band-both .pk-label { color: #bbf7d0; }
-[data-theme="dark"] .pk-black.held { background: linear-gradient(to bottom,#92400e,#b45309,#78350f); border-color: #fcd34d; box-shadow: 2px 3px 8px rgba(217,119,6,.5); }
-[data-theme="dark"] .pk-black.held .pk-label { color: #fef3c7; }
-[data-theme="dark"] .pk-black:active, [data-theme="dark"] .pk-black.pressing { background: linear-gradient(to bottom,#1e3a6e,#1e40af); box-shadow: none; }
+[data-theme="dark"] .pk-black.band-on {
+  background: var(--key-band-fill); border-color: var(--key-band-border);
+  box-shadow: 2px 3px 11px var(--key-band-glow);
+}
+[data-theme="dark"] .pk-black.scale-on {
+  background: var(--key-scale-fill); border-color: var(--key-scale-border);
+  box-shadow: 2px 3px 11px var(--key-scale-glow);
+}
+[data-theme="dark"] .pk-black.scale-pc {
+  background: #3a2e58; border-color: #614a90;
+  box-shadow: none;
+}
+[data-theme="dark"] .pk-black.band-both {
+  background: var(--key-both-fill); border-color: var(--key-both-border);
+  box-shadow: 2px 3px 11px var(--key-both-glow);
+}
+[data-theme="dark"] .pk-black.held {
+  background: var(--key-held-fill); border-color: var(--key-held-border);
+  box-shadow: 2px 3px 13px var(--key-held-glow);
+  animation: pulse-key .5s ease-in-out infinite alternate;
+}
+[data-theme="dark"] .pk-black.band-on .pk-label,
+[data-theme="dark"] .pk-black.scale-on .pk-label,
+[data-theme="dark"] .pk-black.band-both .pk-label,
+[data-theme="dark"] .pk-black.held .pk-label { color: #fff; font-weight: 500; }
+[data-theme="dark"] .pk-black.scale-pc .pk-label { color: #a78bfa; font-weight: 400; }
+[data-theme="dark"] .pk-black:active, [data-theme="dark"] .pk-black.pressing { background: #3a3a3a; box-shadow: none; }
 
 [data-theme="dark"] .rp-black .rp-label { color: rgba(255,255,255,.22); }
-[data-theme="dark"] .rp-black:hover { background: linear-gradient(to bottom,#4c1d95,#5b21b6 70%,#3b0764); border-color: var(--violet-mid); }
-[data-theme="dark"] .rp-black.active { background: linear-gradient(to bottom,#7c3aed,#6d28d9,#4c1d95); border-color: #a78bfa; box-shadow: 1px 2px 8px rgba(124,58,237,.5); }
-[data-theme="dark"] .rp-black.active .rp-label { color: #ddd6fe; }
+[data-theme="dark"] .rp-black:hover:not(.active) { background: #2c2440; border-color: var(--violet-mid); }
+[data-theme="dark"] .rp-black.active {
+  background: var(--key-scale-fill); border-color: var(--key-scale-border);
+  box-shadow: 2px 3px 11px var(--key-scale-glow);
+}
+[data-theme="dark"] .rp-black.active:hover { background: var(--key-scale-fill-hi); }
+[data-theme="dark"] .rp-black.active .rp-label { color: #fff; font-weight: 500; }
 
 /* focus states */
 [data-theme="dark"] .note-input:focus { background: var(--surface); }
 [data-theme="dark"] .scale-search:focus { background: var(--surface); }
+
+/* Slider spines & zero-ticks: neutral in dark */
+[data-theme="dark"] .gain .cslider-spine { background: rgba(160,160,160,0.15) !important; }
+[data-theme="dark"] .zero-tick { background: rgba(160,160,160,0.38) !important; }
+[data-theme="dark"] .gain .cslider-fill { background: var(--text-mid) !important; }
+[data-theme="dark"] .gain .cslider-thumb {
+  background: var(--text) !important;
+  box-shadow: 0 0 0 1.5px var(--text-mid), 0 1px 4px rgba(160,160,160,0.3) !important;
+}
+[data-theme="dark"] .q .cslider-spine { background: rgba(185,158,80,0.18) !important; }
+[data-theme="dark"] .q .cslider-fill { background: var(--amber-mid) !important; }
+[data-theme="dark"] .q .cslider-thumb {
+  background: var(--amber) !important;
+  box-shadow: 0 0 0 1.5px var(--amber-mid), 0 1px 3px rgba(185,158,80,0.35) !important;
+}
+
+/* Piano key hover (un-highlighted keys only — highlighted keys handle
+   their own :hover above so the rules never fight each other) */
+[data-theme="dark"] .pk-white:hover:not(.band-on):not(.scale-on):not(.scale-pc):not(.held):not(.band-both) { background: #c5ccdc; border-color: var(--border-strong); }
+[data-theme="dark"] .pk-black:hover:not(.band-on):not(.scale-on):not(.scale-pc):not(.held):not(.band-both) { background: #282828; border-color: var(--border-strong); }
+[data-theme="dark"] .pk-white.band-on:hover  { background: var(--key-band-fill-hi); }
+[data-theme="dark"] .pk-white.scale-on:hover { background: var(--key-scale-fill-hi); }
+[data-theme="dark"] .pk-white.scale-pc:hover { background: var(--key-scale-pc-fill-hi); }
+[data-theme="dark"] .pk-white.band-both:hover{ background: var(--key-both-fill-hi); }
+[data-theme="dark"] .pk-white.held:hover     { background: var(--key-held-fill-hi); }
+[data-theme="dark"] .pk-black.band-on:hover  { background: var(--key-band-fill-hi); }
+[data-theme="dark"] .pk-black.scale-on:hover { background: var(--key-scale-fill-hi); }
+[data-theme="dark"] .pk-black.scale-pc:hover { background: var(--key-scale-pc-fill-hi); }
+[data-theme="dark"] .pk-black.band-both:hover{ background: var(--key-both-fill-hi); }
+[data-theme="dark"] .pk-black.held:hover     { background: var(--key-held-fill-hi); }
 
 @media(max-width:680px){
   body { padding: 0 10px 48px; }
@@ -695,7 +818,7 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
     <div class="brand-name">harmonic <strong>eq</strong></div>
     <div class="brand-sub">from scales to bands</div>
   </div>
-  <button class="theme-btn" id="themeToggle">☽</button>
+  <button class="theme-btn" id="themeToggle">☀</button>
 </header>
 <main>
 
@@ -1231,7 +1354,6 @@ const SCALE_LIBRARY = [
     ["Symmetrical Nonatonic",   [0,1,2,4,6,7,8,10,11]],
   ]},
 ];
-
 // ═══════════════════════════════════════════════════════════
 //  CONSTANTS
 // ═══════════════════════════════════════════════════════════
@@ -1252,6 +1374,8 @@ function makeTrack(id){
     notes:[],
     gains:{},
     qs:{},
+    gainMemory:{},  // remembers every note's gain/Q ever set, even while the note
+    qMemory:{},      // is temporarily out of the active set (e.g. trimmed by Resize)
     enabled:{transpose:false,invert:false,complement:false,mod:false,scale:false,parmode:false,relmode:false,spread:false,resize:false,mirror:false,negative:false,close:false},
     stepOrder:['mod','scale','transpose','invert','complement','parmode','relmode','mirror','negative','close','spread','resize'],
     linkMode:'',
@@ -1400,16 +1524,40 @@ function buildScaleFolders(){
 }
 
 function applyScale(name,intervals){
+  const prevIntervals=activeScaleIntervals;
+  const sameShape=!!prevIntervals&&prevIntervals.length===intervals.length&&prevIntervals.every((v,i)=>v===intervals[i]);
   activeScaleName=name; activeScaleIntervals=intervals;
   const rootMidi=getRootMidi();
   const midiNotes=intervals.map(i=>rootMidi+i).filter(n=>n>=0&&n<=127);
   const oldGains=Object.assign({},scaleTrack.gains);
   const oldQs=Object.assign({},scaleTrack.qs);
+  const sorted=[...midiNotes].sort((a,b)=>a-b);
+  const pendingGains={}, pendingQs={};
+
+  // Root/octave-only change: same scale degrees, just shifted in pitch.
+  // Carry each degree's slider settings forward by its position in the
+  // scale (1st degree keeps 1st degree's gain/Q, etc.) instead of by
+  // absolute pitch or pitch class — both of those change when the root
+  // moves, which is why root changes used to reset every band to default.
+  if(sameShape){
+    const prevSorted=[...scaleTrack.source].sort((a,b)=>a-b);
+    if(prevSorted.length===sorted.length){
+      for(let i=0;i<sorted.length;i++){
+        const n=sorted[i], d=prevSorted[i];
+        pendingGains[n]=oldGains[d]!==undefined?oldGains[d]:0;
+        pendingQs[n]=oldQs[d]!==undefined?oldQs[d]:30;
+      }
+      return finishApplyScale(name,intervals,midiNotes,pendingGains,pendingQs);
+    }
+  }
+
+  // Switching to a different scale (or a root/octave move that pushed notes
+  // past the 0-127 boundary so degree counts don't line up): fall back to
+  // matching by exact pitch, then by pitch class, then by interpolating
+  // between the nearest matched degrees.
   const pcGains={}, pcQs={};
   for(const[k,v] of Object.entries(oldGains)){ const pc=((parseInt(k)%12)+12)%12; if(pcGains[pc]===undefined) pcGains[pc]=v; }
   for(const[k,v] of Object.entries(oldQs)){ const pc=((parseInt(k)%12)+12)%12; if(pcQs[pc]===undefined) pcQs[pc]=v; }
-  const sorted=[...midiNotes].sort((a,b)=>a-b);
-  const pendingGains={}, pendingQs={};
   const isNew={};
   for(const n of sorted){
     const pc=((n%12)+12)%12;
@@ -1428,6 +1576,10 @@ function applyScale(name,intervals){
     else if(nextG!==null){ pendingGains[n]=nextG; pendingQs[n]=nextQ; }
     else { pendingGains[n]=0; pendingQs[n]=30; }
   }
+  return finishApplyScale(name,intervals,midiNotes,pendingGains,pendingQs);
+}
+
+function finishApplyScale(name,intervals,midiNotes,pendingGains,pendingQs){
   // Stash the propagated values so showResult picks them up instead of resetting to defaults
   scaleTrack._pendingGains=pendingGains;
   scaleTrack._pendingQs=pendingQs;
@@ -1483,9 +1635,9 @@ document.getElementById('root-oct-up').addEventListener('click',()=>{ rootOct=Ma
 document.getElementById('clear-scale-btn').addEventListener('click',()=>{
   clearActiveScale();
   scaleTrack.source=[]; scaleTrack.baseNotes=[]; scaleTrack.notes=[]; scaleTrack.gains={}; scaleTrack.qs={};
+  scaleTrack.gainMemory={}; scaleTrack.qMemory={};
   buildSliders(scaleTrack); rebuildFilterChain(); renderKbdStrip();
 });
-
 // ═══════════════════════════════════════════════════════════
 //  TRANSFORM OPERATIONS
 // ═══════════════════════════════════════════════════════════
@@ -1635,6 +1787,7 @@ function opSpread(notes, modulo, allowTopCluster, minRatioLow, minRatioHigh){
 function runChain(track){
   const pf=track.id+'-';
   let result=[...track.baseNotes];
+  track._spreadPreG=null; track._spreadPreQ=null;
   for(const op of track.stepOrder){
     if(!track.enabled[op]) continue;
     switch(op){
@@ -1648,6 +1801,17 @@ function runChain(track){
       case 'relmode':    result=opRotoTranslate(result,getN(pf+'tx-rt-off'),Math.max(0,getN(pf+'tx-rt-len'))); break;
       case 'spread': {
         const allowTop=document.getElementById(pf+'tx-sp-top')?.checked||false;
+        // Snapshot gains/Q by pitch-class BEFORE spread remaps notes to new octaves.
+        // showResult will use this to restore slider values onto the new MIDI numbers.
+        const preG={}, preQ={};
+        for(const n of result){
+          const pc=((n%12)+12)%12;
+          if(preG[pc]===undefined){
+            preG[pc]=track.gains[n]!==undefined?track.gains[n]:(track.gainMemory[n]!==undefined?track.gainMemory[n]:0);
+            preQ[pc]=track.qs[n]!==undefined?track.qs[n]:(track.qMemory[n]!==undefined?track.qMemory[n]:30);
+          }
+        }
+        track._spreadPreG=preG; track._spreadPreQ=preQ;
         result=opSpread(result,12,allowTop,4/3,9/8);
       } break;
       case 'resize': {
@@ -1672,16 +1836,38 @@ function showResult(result,track){
   const pendingG=track._pendingGains||null;
   const pendingQ=track._pendingQs||null;
   track._pendingGains=null; track._pendingQs=null;
+  // Consume pre-spread pitch-class snapshot (spread path)
+  const spreadG=track._spreadPreG||null;
+  const spreadQ=track._spreadPreQ||null;
+  track._spreadPreG=null; track._spreadPreQ=null;
+  // Pitch-class fallback, drawn from the full persistent memory (not just the
+  // currently active notes) so a brand-new note can still inherit a sensible
+  // value even if its pitch class isn't active right now.
+  const pcG={}, pcQ={};
+  for(const[k,v] of Object.entries(track.gainMemory)){ const pc=((parseInt(k)%12)+12)%12; if(pcG[pc]===undefined) pcG[pc]=v; }
+  for(const[k,v] of Object.entries(track.qMemory)){ const pc=((parseInt(k)%12)+12)%12; if(pcQ[pc]===undefined) pcQ[pc]=v; }
   track.gains={}; track.qs={};
   track.notes=result.filter(v=>Number.isFinite(v));
   for(let i=0;i<track.notes.length;i++){
-    const n=track.notes[i];
+    const n=track.notes[i], pc=((n%12)+12)%12;
+    let g,q;
     if(pendingG&&pendingG[n]!==undefined){
       // Use the pre-propagated value from applyScale (preserves user's settings across scale changes)
-      track.gains[n]=pendingG[n]; track.qs[n]=pendingQ[n];
-    } else if(oldG[n]!==undefined){ track.gains[n]=oldG[n]; track.qs[n]=oldQ[n]; }
-    else if(prev.length){ const d=prev[i%prev.length]; track.gains[n]=oldG[d]!==undefined?oldG[d]:0; track.qs[n]=oldQ[d]!==undefined?oldQ[d]:30; }
-    else { track.gains[n]=0; track.qs[n]=30; }
+      g=pendingG[n]; q=pendingQ[n];
+    } else if(spreadG&&spreadG[pc]!==undefined){
+      // Spread remapped this note to a new octave — restore gain/Q from the pre-spread pitch-class snapshot
+      g=spreadG[pc]; q=spreadQ[pc]!==undefined?spreadQ[pc]:30;
+    } else if(track.gainMemory[n]!==undefined){
+      // This exact note has been seen before — e.g. Resize/Relative Mode shrank
+      // it out of the active set and it's now being expanded back in. Restore
+      // its remembered slider settings exactly, rather than re-deriving them.
+      g=track.gainMemory[n]; q=track.qMemory[n]!==undefined?track.qMemory[n]:30;
+    } else if(oldG[n]!==undefined){ g=oldG[n]; q=oldQ[n]; }
+    else if(pcG[pc]!==undefined){ g=pcG[pc]; q=pcQ[pc]!==undefined?pcQ[pc]:30; }
+    else if(prev.length){ const d=prev[i%prev.length]; g=oldG[d]!==undefined?oldG[d]:0; q=oldQ[d]!==undefined?oldQ[d]:30; }
+    else { g=0; q=30; }
+    track.gains[n]=g; track.qs[n]=q;
+    track.gainMemory[n]=g; track.qMemory[n]=q;
   }
   buildSliders(track); rebuildFilterChain(); renderKbdStrip();
 }
@@ -1829,6 +2015,16 @@ function renderKbdStrip(){
   const inpPcSet=new Set([...inputTrack.notes].map(n=>((n%12)+12)%12));
   const sclPcSet=new Set([...scaleTrack.notes].map(n=>((n%12)+12)%12));
 
+  // Classify a note: returns the CSS class to add for scale highlighting
+  // scale-on  → note has a slider in the scale track (exact octave match)
+  // scale-pc  → note's pitch class is in the scale but in a different octave (no slider here)
+  function sclClass(mNote, pc, highlight){
+    if(highlight!=='both'&&highlight!=='scale') return null;
+    if(sclSet.has(mNote)) return 'scale-on';
+    if(sclPcSet.has(pc))  return 'scale-pc';
+    return null;
+  }
+
   // Render 3 octaves: kbOctave through kbOctave+2
   for(let oct=kbOctave; oct<=kbOctave+2; oct++){
     if(oct<0||oct>9) continue;
@@ -1849,12 +2045,11 @@ function renderKbdStrip(){
       const key=document.createElement('div');
       key.className='pk-white';
       key.dataset.note=mNote;
-      // State — exact match for input/held, pc match for scale
+      // State — priority: held > both-overlap > input band > scale active > scale inactive
       if(heldInputNotes.has(mNote)) key.classList.add('held');
       else if(kbHighlight==='both'&&inpSet.has(mNote)&&sclPcSet.has(pc)) key.classList.add('band-both');
       else if((kbHighlight==='both'||kbHighlight==='input')&&inpSet.has(mNote)) key.classList.add('band-on');
-      else if((kbHighlight==='both'||kbHighlight==='scale')&&sclPcSet.has(pc)) key.classList.add('scale-on');
-      else key.classList.add('in-range');
+      else { const sc=sclClass(mNote,pc,kbHighlight); if(sc) key.classList.add(sc); else key.classList.add('in-range'); }
       // Label: keyboard hint or note name
       let hint=NOTE_NAMES[pc];
       if(oct===kbOctave){ for(const[k,v] of Object.entries(KEY_LOWER)) if(v===pc){ hint=k.toUpperCase(); break; } }
@@ -1873,11 +2068,11 @@ function renderKbdStrip(){
       key.dataset.note=mNote;
       key.style.left=leftOff+'px';
       key.style.top='0';
-      // State — exact match for input/held, pc match for scale
+      // State — priority: held > both-overlap > input band > scale active > scale inactive
       if(heldInputNotes.has(mNote)) key.classList.add('held');
       else if(kbHighlight==='both'&&inpSet.has(mNote)&&sclPcSet.has(pc)) key.classList.add('band-both');
       else if((kbHighlight==='both'||kbHighlight==='input')&&inpSet.has(mNote)) key.classList.add('band-on');
-      else if((kbHighlight==='both'||kbHighlight==='scale')&&sclPcSet.has(pc)) key.classList.add('scale-on');
+      else { const sc=sclClass(mNote,pc,kbHighlight); if(sc) key.classList.add(sc); }
       // Label
       let hint=NOTE_NAMES[pc];
       if(oct===kbOctave){ for(const[k,v] of Object.entries(KEY_LOWER)) if(v===pc){ hint=k.toUpperCase(); break; } }
@@ -1922,8 +2117,8 @@ function propagate(srcNote,type,val,srcTrack){
       if(globalLinkMode==='global') match=true;
       else if(globalLinkMode==='pc'&&((n%12)+12)%12===pc) match=true;
       if(!match) continue;
-      if(type==='gain'){ track.gains[n]=val; track.sliderMap.get(n)?.gain?.setVal(val,true); updateFilterParam(n,'gain',track); }
-      else             { track.qs[n]=val;   track.sliderMap.get(n)?.q?.setVal(val,true);    updateFilterParam(n,'q',track); }
+      if(type==='gain'){ track.gains[n]=val; track.gainMemory[n]=val; track.sliderMap.get(n)?.gain?.setVal(val,true); updateFilterParam(n,'gain',track); }
+      else             { track.qs[n]=val;   track.qMemory[n]=val;   track.sliderMap.get(n)?.q?.setVal(val,true);    updateFilterParam(n,'q',track); }
     }
   }
 }
@@ -1955,8 +2150,8 @@ function makeCSlider(n,type,track,compact){
   }
   function setVal(v,silent){
     v=Math.round(Math.max(min,Math.min(max,v))); currentVal=v; render(v);
-    if(isGain){ track.gains[n]=v; const el=document.getElementById(pf+'nv-'+n); if(el) el.textContent=(v>0?'+':'')+v+' dB'; }
-    else      { track.qs[n]=v;   const el=document.getElementById(pf+'qv-'+n); if(el) el.textContent='Q'+v; }
+    if(isGain){ track.gains[n]=v; track.gainMemory[n]=v; const el=document.getElementById(pf+'nv-'+n); if(el) el.textContent=(v>0?'+':'')+v+' dB'; renderKbdStrip(); }
+    else      { track.qs[n]=v;   track.qMemory[n]=v;   const el=document.getElementById(pf+'qv-'+n); if(el) el.textContent='Q'+v; }
     if(!silent){ propagate(n,type,v,track); updateFilterParam(n,type,track); }
   }
   const DEFAULT_VAL=isGain?0:30;
@@ -2004,6 +2199,7 @@ function buildSliders(track){
     const fStr=disabled?'—':(freq<1000?Math.round(freq)+' Hz':(freq/1000).toFixed(2)+' k');
     const gain=track.gains[n]??0, q=track.qs[n]??5;
     track.gains[n]=gain; track.qs[n]=q;
+    track.gainMemory[n]=gain; track.qMemory[n]=q;
     const pc=((n%12)+12)%12;
 
     let cls='note-col';
@@ -2034,8 +2230,8 @@ function buildSliders(track){
       track.source=track.source.filter(x=>x!==n); track.baseNotes=track.baseNotes.filter(x=>x!==n);
       if(track.id==='inp') heldInputNotes.delete(n);
       delete track.gains[n]; delete track.qs[n];
-      if(track.id==='scl') clearActiveScale();
-      if(track.id==='inp') syncInputToTextField();
+      delete track.gainMemory[n]; delete track.qMemory[n];
+      if(track.id==='scl') clearActiveScale();      if(track.id==='inp') syncInputToTextField();
       runChain(track);
     });
     col.appendChild(rm); area.appendChild(col);
@@ -2047,14 +2243,13 @@ function buildSliders(track){
 // ═══════════════════════════════════════════════════════════
 function initBandUtils(track){
   const pf=track.id+'-';
-  document.getElementById(pf+'reset-gains-btn').addEventListener('click',()=>{ for(const n of track.notes){ track.gains[n]=0; track.sliderMap.get(n)?.gain?.setVal(0,true); updateFilterParam(n,'gain',track); } rebuildFilterChain(); });
-  document.getElementById(pf+'reset-q-btn').addEventListener('click',()=>{ for(const n of track.notes){ track.qs[n]=30; track.sliderMap.get(n)?.q?.setVal(30,true); updateFilterParam(n,'q',track); } rebuildFilterChain(); });
-  document.getElementById(pf+'clear-bands-btn').addEventListener('click',()=>{
+  document.getElementById(pf+'reset-gains-btn').addEventListener('click',()=>{ for(const n of track.notes){ track.gains[n]=0; track.gainMemory[n]=0; track.sliderMap.get(n)?.gain?.setVal(0,true); updateFilterParam(n,'gain',track); } rebuildFilterChain(); });
+  document.getElementById(pf+'reset-q-btn').addEventListener('click',()=>{ for(const n of track.notes){ track.qs[n]=30; track.qMemory[n]=30; track.sliderMap.get(n)?.q?.setVal(30,true); updateFilterParam(n,'q',track); } rebuildFilterChain(); });  document.getElementById(pf+'clear-bands-btn').addEventListener('click',()=>{
     track.notes=[]; track.gains={}; track.qs={}; track.source=[]; track.baseNotes=[];
+    track.gainMemory={}; track.qMemory={};
     if(track===inputTrack){ heldInputNotes.clear(); document.getElementById('note-input').value=''; }
     buildSliders(track); rebuildFilterChain(); renderKbdStrip();
-  });
-  document.getElementById(pf+'global-link-btn').addEventListener('click',()=>setLinkMode(track,'global'));
+  });  document.getElementById(pf+'global-link-btn').addEventListener('click',()=>setLinkMode(track,'global'));
   document.getElementById(pf+'pc-link-btn').addEventListener('click',()=>setLinkMode(track,'pc'));
 
   // +/- size buttons
@@ -2225,11 +2420,11 @@ document.getElementById('set-btn').addEventListener('click',()=>{ inputTrack.bas
 document.getElementById('note-input').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); inputTrack.baseNotes=[...inputTrack.source]; runChain(inputTrack); } });
 document.getElementById('clear-btn').addEventListener('click',()=>{
   inputTrack.source=[]; inputTrack.baseNotes=[]; inputTrack.notes=[]; inputTrack.gains={}; inputTrack.qs={};
+  inputTrack.gainMemory={}; inputTrack.qMemory={};
   heldInputNotes.clear(); heldKbKeys.clear();
   document.getElementById('note-input').value='';
   buildSliders(inputTrack); rebuildFilterChain(); renderKbdStrip();
-});
-document.getElementById('tuning-hz').addEventListener('input',function(){ const v=parseFloat(this.value); if(v>0){ tuning=v; runChain(inputTrack); runChain(scaleTrack); } });
+});document.getElementById('tuning-hz').addEventListener('input',function(){ const v=parseFloat(this.value); if(v>0){ tuning=v; runChain(inputTrack); runChain(scaleTrack); } });
 
 // ═══════════════════════════════════════════════════════════
 //  AUDIO / MIDI UI EVENTS
@@ -2283,14 +2478,14 @@ window.addEventListener('resize',()=>{
 function getThemeColors(){
   const isDark=document.documentElement.dataset.theme==='dark';
   return isDark ? {
-    bg:'#111111',
-    gridZero:'rgba(26,86,219,.3)', gridLine:'rgba(26,86,219,.09)',
-    labelZero:'rgba(26,86,219,.6)', label:'rgba(26,86,219,.28)',
-    inputLine:'rgba(26,86,219,.12)', scaleLine:'rgba(124,58,237,.12)',
-    fftFill:'rgba(22,163,74,.08)', fftStroke:'rgba(22,163,74,.5)',
-    eqFill:'rgba(26,86,219,.08)', eqGlow:'rgba(26,86,219,.18)', eqLine:'rgba(26,86,219,.9)',
-    dotBg:'#111111',
-    inputBase:[26,86,219], scaleBase:[124,58,237], heldBase:[217,119,6]
+    bg:'#141414',
+    gridZero:'rgba(255,255,255,0.08)', gridLine:'rgba(255,255,255,0.04)',
+    labelZero:'#555555', label:'#444444',
+    inputLine:'rgba(160,160,160,0.10)', scaleLine:'rgba(160,160,160,0.07)',
+    fftFill:'rgba(160,160,160,0.06)', fftStroke:'rgba(160,160,160,0.35)',
+    eqFill:'rgba(160,160,160,0.06)', eqGlow:'rgba(160,160,160,0.12)', eqLine:'#a0a0a0',
+    dotBg:'#141414',
+    inputBase:[168,168,168], scaleBase:[148,128,188], heldBase:[185,158,80]
   } : {
     bg:'#f4f7fe',
     gridZero:'rgba(26,86,219,.22)', gridLine:'rgba(26,86,219,.07)',
@@ -2432,7 +2627,7 @@ renderKbdStrip();
 // ═══════════════════════════════════════════════════════════
 //  THEME TOGGLE
 // ═══════════════════════════════════════════════════════════
-let currentTheme = 'light';
+let currentTheme = 'dark';
 document.getElementById('themeToggle').addEventListener('click', () => {
   currentTheme = currentTheme === 'light' ? 'dark' : 'light';
 
@@ -2443,6 +2638,7 @@ document.getElementById('themeToggle').addEventListener('click', () => {
 
   document.documentElement.dataset.theme = currentTheme === 'dark' ? 'dark' : '';
   document.getElementById('themeToggle').textContent = currentTheme === 'dark' ? '☀' : '☽';
+  renderKbdStrip();
 
   requestAnimationFrame(() => noTrans.remove());
 });
