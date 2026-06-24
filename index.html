@@ -1643,7 +1643,7 @@ document.getElementById('clear-scale-btn').addEventListener('click',()=>{
 //  TRANSFORM OPERATIONS
 // ═══════════════════════════════════════════════════════════
 function opTranspose(arr,s){ return arr.map(v=>v+s); }
-function opInvert(arr,ax){ if(!arr.length) return []; const axv=arr[ediv(ax,arr.length).r]; return arr.map(v=>2*axv-v).sort((a,b)=>a-b); }
+function opInvert(arr,ax){ if(!arr.length) return []; const sorted=[...arr].sort((a,b)=>a-b); const axv=sorted[ediv(ax,sorted.length).r]; return sorted.map(v=>2*axv-v).sort((a,b)=>a-b); }
 function opComplement(arr){ if(!arr.length) return []; const mn=Math.min(...arr); const norm=new Set(arr.map(v=>v-mn)); const out=[],range=calcRange(arr,12); for(let i=0;i<range;i++) if(!norm.has(i)) out.push(mn+i); return out; }
 function opRotoTranslate(arr,off,len){ if(!arr.length) return []; const sorted=[...arr].sort((a,b)=>a-b),sz=sorted.length; const outLen=len>0?len:sz,range=calcRange(sorted,12); const out=[]; for(let i=0;i<outLen;i++){ const{q:cyc,r:idx}=ediv(off+i,sz); out.push(sorted[idx]+range*cyc); } return out; }
 function opMod(arr,m){ const seen=new Set(); return arr.map(v=>ediv(v,m).r).filter(v=>{ if(seen.has(v)) return false; seen.add(v); return true; }).sort((a,b)=>a-b); }
@@ -1696,8 +1696,9 @@ function opResize(arr,start,end){
 
 function mirror(arr,ax=0){
   if(!arr.length) return [];
-  const firstVal=arr[0];
-  const inverted=opInvert(arr,ax);
+  const sorted=[...arr].sort((a,b)=>a-b);
+  const firstVal=sorted[0];
+  const inverted=opInvert(sorted,ax);
   const diff=firstVal-inverted[0];
   return inverted.map(v=>v+diff);
 }
@@ -1794,7 +1795,7 @@ function runChain(track){
     if(!track.enabled[op]) continue;
     switch(op){
       case 'transpose':  result=opTranspose(result,getN(pf+'tx-scalar')); break;
-      case 'invert':     result=opInvert(result,getN(pf+'tx-axis')); break;
+      case 'invert':     result=[...result].sort((a,b)=>a-b); result=opInvert(result,getN(pf+'tx-axis')); break;
       case 'complement': result=opComplement(result); break;
       case 'mod':        result=opMod(result,Math.max(1,getN(pf+'tx-mod'))); break;
       case 'close':      result=opClose(result); break;
@@ -1832,7 +1833,7 @@ function runChain(track){
         const s=getN(pf+'tx-rs-start'), e=getN(pf+'tx-rs-end');
         result=opResize(result,s,e);
       } break;
-      case 'mirror':    result=mirror(result); break;
+      case 'mirror':    result=[...result].sort((a,b)=>a-b); result=mirror(result); break;
       case 'negative': {
         const rootEl = document.getElementById(pf+'tx-neg-root');
         const root = rootEl ? (parseInt(rootEl.value) || 0) : 0;
