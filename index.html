@@ -798,6 +798,27 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
 [data-theme="dark"] .pk-black.band-both:hover{ background: var(--key-both-fill-hi); }
 [data-theme="dark"] .pk-black.held:hover     { background: var(--key-held-fill-hi); }
 
+/* ── Tooltip ──────────────────────────────────────────────── */
+.tt {
+  position: fixed;
+  z-index: 99999;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.5;
+  padding: 6px 10px;
+  border-radius: 4px;
+  max-width: 220px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.1s;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  white-space: normal;
+}
+.tt.visible { opacity: 1; }
+
 @media(max-width:680px){
   body { padding: 0 10px 48px; }
   .dual-row { grid-template-columns: 1fr; }
@@ -818,7 +839,7 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
     <div class="brand-name">harmonic <strong>eq</strong></div>
     <div class="brand-sub">from scales to bands</div>
   </div>
-  <button class="theme-btn" id="themeToggle">☀</button>
+  <button class="theme-btn" id="themeToggle" data-tooltip="Switches between light and dark theme.">☀</button>
 </header>
 <main>
 
@@ -826,12 +847,12 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
   <div class="panel">
     <div class="panel-label input-accent">Input</div>
     <div class="source-row">
-      <input id="note-input" class="note-input" type="text" placeholder="e.g. 60 64 67 72 …  or play keys/MIDI" inputmode="text"/>
-      <button id="set-btn">Set</button>
-      <button id="clear-btn">Clear</button>
+      <input id="note-input" class="note-input" type="text" placeholder="e.g. 60 64 67 72 …  or play keys/MIDI" inputmode="text" data-tooltip="MIDI note numbers 0-127, space-separated. You can also play the piano or MIDI controller below."/>
+      <button id="set-btn" data-tooltip="Locks these notes as the base for transforms. Press after editing notes manually.">Set</button>
+      <button id="clear-btn" data-tooltip="Removes all input notes and clears all Input Bands.">Clear</button>
       <div class="tuning-row">
         <span class="tuning-label">A =</span>
-        <input type="number" id="tuning-hz" value="440" step="1" style="width:62px"/>
+        <input type="number" id="tuning-hz" value="440" step="1" style="width:62px" data-tooltip="A4 reference pitch in Hz. Changes how MIDI note numbers map to frequencies."/>
         <span class="tuning-label">Hz</span>
       </div>
     </div>
@@ -847,9 +868,9 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
       <div class="root-selector-right">
         <div class="panel-label" style="margin-bottom:10px">Octave</div>
         <div class="root-oct-group">
-          <button class="root-oct-btn" id="root-oct-dn">−</button>
+          <button class="root-oct-btn" id="root-oct-dn" data-tooltip="Lowers the scale root by one octave.">−</button>
           <span class="root-oct-display" id="root-oct-display">4</span>
-          <button class="root-oct-btn" id="root-oct-up">+</button>
+          <button class="root-oct-btn" id="root-oct-up" data-tooltip="Raises the scale root by one octave.">+</button>
         </div>
         <span class="root-midi-note" id="root-midi-label" style="margin-top:6px;display:block">C4 · 60</span>
       </div>
@@ -862,21 +883,21 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
       <div class="panel-label scale-accent">Scale Library</div>
       <div class="scale-search-wrap">
         <span class="scale-search-icon">⌕</span>
-        <input class="scale-search" id="scale-search" type="text" placeholder="Search scales…"/>
+        <input class="scale-search" id="scale-search" type="text" placeholder="Search scales…" data-tooltip="Search by name. Partial matches work."/>
       </div>
     </div>
     <div class="scale-folders" id="scale-folders"></div>
     <div class="active-scale-row hidden" id="active-scale-row">
       <span class="active-scale-name" id="active-scale-name">—</span>
       <span class="active-scale-intervals" id="active-scale-intervals"></span>
-      <button class="clear-scale-btn" id="clear-scale-btn">✕ clear</button>
+      <button class="clear-scale-btn" id="clear-scale-btn" data-tooltip="Removes the active scale and clears all Scale Bands.">✕ clear</button>
     </div>
   </div>
 
   <!-- EQ Curve -->
   <div class="panel">
     <div class="panel-label">EQ Curve</div>
-    <div class="eq-canvas-wrap"><canvas id="spectrum"></canvas></div>
+    <div class="eq-canvas-wrap" data-tooltip="EQ curve. X: 20 Hz to 20 kHz. Y: -18 to +18 dB. Dots are active band centers. Green fill is the live spectrum (when audio is on)."><canvas id="spectrum"></canvas></div>
   </div>
 
   <!-- Audio Engine -->
@@ -884,17 +905,17 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
     <div class="panel-label">Audio Engine</div>
     <div class="audio-top-row">
       <div class="src-group">
-        <button class="src-btn active" data-src="off">Off</button>
-        <button class="src-btn" data-src="mic">Mic</button>
-        <button class="src-btn" data-src="white">White</button>
-        <button class="src-btn" data-src="pink">Pink</button>
-        <button class="src-btn" data-src="brown">Brown</button>
-        <button class="src-btn" data-src="file" id="file-src-btn">File…</button>
+        <button class="src-btn active" data-src="off" data-tooltip="Stops audio output.">Off</button>
+        <button class="src-btn" data-src="mic" data-tooltip="Routes your mic through the EQ. Shows live spectrum on the curve.">Mic</button>
+        <button class="src-btn" data-src="white" data-tooltip="White noise: equal energy at every frequency.">White</button>
+        <button class="src-btn" data-src="pink" data-tooltip="Pink noise: equal energy per octave.">Pink</button>
+        <button class="src-btn" data-src="brown" data-tooltip="Brown noise: heavy bass, warm rumble.">Brown</button>
+        <button class="src-btn" data-src="file" id="file-src-btn" data-tooltip="Loads an audio file from your device and plays it through the EQ.">File…</button>
         <input type="file" id="audio-file-input" accept="audio/*" style="display:none"/>
       </div>
       <div class="vol-group">
         <span class="tuning-label">Vol</span>
-        <input type="range" id="master-vol" class="vol-slider" min="0" max="1" step="0.01" value="0.7"/>
+        <input type="range" id="master-vol" class="vol-slider" min="0" max="1" step="0.01" value="0.7" data-tooltip="Master output volume."/>
         <span class="vol-pct" id="vol-pct">70%</span>
       </div>
       <div class="status-group" id="audio-status">
@@ -912,8 +933,8 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
     <div class="gstrip-divider"></div>
     <div class="gstrip-section" style="gap:4px;">
       <span class="gstrip-label" style="color:var(--text-mid)">Both tracks:</span>
-      <button id="global-mst-btn" class="glink-btn">MST</button>
-      <button id="global-pc-btn" class="glink-btn">PC</button>
+      <button id="global-mst-btn" class="glink-btn" data-tooltip="Links all bands on both tracks. Moving any slider moves all others to match.">MST</button>
+      <button id="global-pc-btn" class="glink-btn" data-tooltip="Links same-note bands across both tracks. All Cs move together, all Ds move together, etc.">PC</button>
     </div>
   </div>
 
@@ -924,15 +945,15 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
       <div class="bands-header">
         <span class="bands-title" style="color:var(--blue)">Input Bands</span>
         <span class="band-count-badge input-badge" id="inp-band-count-badge">0 bands</span>
-        <button id="inp-size-minus" class="size-btn" title="Compact view">−</button>
-        <button id="inp-size-plus"  class="size-btn" title="Full view">+</button>
-        <button id="inp-global-link-btn" class="link-btn">MST</button>
-        <button id="inp-pc-link-btn"     class="link-btn">PC</button>
-        <button id="inp-clear-bands-btn" class="link-btn clear-bands-btn">Clear</button>
+        <button id="inp-size-minus" class="size-btn" title="Compact view" data-tooltip="Compact slider view.">−</button>
+        <button id="inp-size-plus"  class="size-btn" title="Full view"    data-tooltip="Full-size slider view.">+</button>
+        <button id="inp-global-link-btn" class="link-btn" data-tooltip="Links all Input Band sliders together. Moving one moves all.">MST</button>
+        <button id="inp-pc-link-btn"     class="link-btn" data-tooltip="Links Input bands with the same note name. All C bands move together, etc.">PC</button>
+        <button id="inp-clear-bands-btn" class="link-btn clear-bands-btn" data-tooltip="Removes all Input Bands.">Clear</button>
       </div>
       <div class="bands-util-row" id="inp-bands-util-row" style="display:none">
-        <button class="bands-util-btn" id="inp-reset-gains-btn">Reset Gains</button>
-        <button class="bands-util-btn reset-q" id="inp-reset-q-btn">Reset Q</button>
+        <button class="bands-util-btn" id="inp-reset-gains-btn" data-tooltip="Resets all Input Band gains to 0 dB.">Reset Gains</button>
+        <button class="bands-util-btn reset-q" id="inp-reset-q-btn" data-tooltip="Resets all Input Band Q values to Q30.">Reset Q</button>
       </div>
       <div id="inp-sliders-area" class="sliders-area"><span class="empty-hint">Play MIDI/keys or type note numbers…</span></div>
     </div>
@@ -941,15 +962,15 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
       <div class="bands-header">
         <span class="bands-title" style="color:var(--violet)">Scale Bands</span>
         <span class="band-count-badge scale-badge" id="scl-band-count-badge">0 bands</span>
-        <button id="scl-size-minus" class="size-btn scale-size" title="Compact view">−</button>
-        <button id="scl-size-plus"  class="size-btn scale-size" title="Full view">+</button>
-        <button id="scl-global-link-btn" class="link-btn scale-link">MST</button>
-        <button id="scl-pc-link-btn"     class="link-btn scale-link">PC</button>
-        <button id="scl-clear-bands-btn" class="link-btn clear-bands-btn scale-clear">Clear</button>
+        <button id="scl-size-minus" class="size-btn scale-size" title="Compact view" data-tooltip="Compact slider view.">−</button>
+        <button id="scl-size-plus"  class="size-btn scale-size" title="Full view"    data-tooltip="Full-size slider view.">+</button>
+        <button id="scl-global-link-btn" class="link-btn scale-link" data-tooltip="Links all Scale Band sliders together. Moving one moves all.">MST</button>
+        <button id="scl-pc-link-btn"     class="link-btn scale-link" data-tooltip="Links Scale bands with the same note name. All C bands move together, etc.">PC</button>
+        <button id="scl-clear-bands-btn" class="link-btn clear-bands-btn scale-clear" data-tooltip="Removes all Scale Bands.">Clear</button>
       </div>
       <div class="bands-util-row" id="scl-bands-util-row" style="display:none">
-        <button class="bands-util-btn" id="scl-reset-gains-btn">Reset Gains</button>
-        <button class="bands-util-btn reset-q" id="scl-reset-q-btn">Reset Q</button>
+        <button class="bands-util-btn" id="scl-reset-gains-btn" data-tooltip="Resets all Scale Band gains to 0 dB.">Reset Gains</button>
+        <button class="bands-util-btn reset-q" id="scl-reset-q-btn" data-tooltip="Resets all Scale Band Q values to Q30.">Reset Q</button>
       </div>
       <div id="scl-sliders-area" class="sliders-area"><span class="empty-hint">Pick a scale from the library…</span></div>
     </div>
@@ -965,21 +986,21 @@ canvas#spectrum { position: absolute; top: 0; left: 0; width: 100%; height: 100%
       </div>
       <div class="mode-group">
         <span class="tuning-label">Mode</span>
-        <button class="mode-btn active" data-mode="latch">Latch</button>
-        <button class="mode-btn" data-mode="momentary">Momentary</button>
+        <button class="mode-btn active" data-mode="latch" data-tooltip="Notes stay active after release. Click again to remove.">Latch</button>
+        <button class="mode-btn" data-mode="momentary" data-tooltip="Notes are only active while held. Releasing removes them.">Momentary</button>
       </div>
       <div class="oct-group">
         <span class="tuning-label">Oct</span>
-        <button class="oct-btn" id="oct-dn">−</button>
+        <button class="oct-btn" id="oct-dn" data-tooltip="Shifts the keyboard down one octave.">−</button>
         <span class="oct-display" id="oct-display">4</span>
-        <button class="oct-btn" id="oct-up">+</button>
+        <button class="oct-btn" id="oct-up" data-tooltip="Shifts the keyboard up one octave.">+</button>
       </div>
       <div class="hl-group">
         <span class="tuning-label">Highlight</span>
-        <button class="hl-btn active-both" data-hl="both">Both</button>
-        <button class="hl-btn" data-hl="input">Input</button>
-        <button class="hl-btn" data-hl="scale">Scale</button>
-        <button class="hl-btn" data-hl="none">None</button>
+        <button class="hl-btn active-both" data-hl="both"  data-tooltip="Shows both Input and Scale notes on the keyboard.">Both</button>
+        <button class="hl-btn" data-hl="input"  data-tooltip="Shows only Input notes on the keyboard.">Input</button>
+        <button class="hl-btn" data-hl="scale"  data-tooltip="Shows only Scale notes on the keyboard.">Scale</button>
+        <button class="hl-btn" data-hl="none"   data-tooltip="No highlighting.">None</button>
       </div>
     </div>
     <div class="piano-wrap" id="kbd-strip"></div>
@@ -1486,6 +1507,7 @@ function buildRootPcBtns(){
     const btn=document.createElement('div');
     btn.className='rp-white'+(pc===rootPc?' active':'');
     btn.dataset.pc=pc;
+    btn.dataset.tooltip='Sets '+PC_NAMES[pc]+' as the root note.';
     const lbl=document.createElement('span'); lbl.className='rp-label'; lbl.textContent=PC_NAMES[pc];
     btn.appendChild(lbl);
     btn.addEventListener('click',()=>{ rootPc=pc; buildRootPcBtns(); document.getElementById('root-midi-label').textContent=getRootMidiLabel(); if(activeScaleIntervals) applyScale(activeScaleName,activeScaleIntervals); });
@@ -1496,6 +1518,7 @@ function buildRootPcBtns(){
     const btn=document.createElement('div');
     btn.className='rp-black'+(pc===rootPc?' active':'');
     btn.dataset.pc=pc;
+    btn.dataset.tooltip='Sets '+PC_NAMES[pc]+' as the root note.';
     btn.style.left=leftOff+'px';
     btn.style.top='0';
     const lbl=document.createElement('span'); lbl.className='rp-label'; lbl.textContent=PC_NAMES[pc];
@@ -1513,10 +1536,12 @@ function buildScaleFolders(){
     const folder=document.createElement('div'); folder.className='scale-folder'; folder.dataset.gi=gi;
     const hdr=document.createElement('div'); hdr.className='scale-folder-hdr';
     hdr.innerHTML=`<span class="folder-arrow">▶</span><span class="folder-name">${group.cat}</span><span class="folder-count">${group.scales.length}</span>`;
+    hdr.dataset.tooltip='Opens or closes this category ('+group.scales.length+' scales).';
     hdr.addEventListener('click',()=>{ if(document.getElementById('scale-folders').classList.contains('searching')) return; const isOpen=folder.classList.contains('open'); document.querySelectorAll('.scale-folder.open').forEach(f=>f.classList.remove('open')); if(!isOpen) folder.classList.add('open'); });
     const body=document.createElement('div'); body.className='scale-folder-body';
     group.scales.forEach(([name,intervals])=>{
       const pill=document.createElement('button'); pill.className='scale-pill'; pill.textContent=name; pill.dataset.name=name;
+      pill.dataset.tooltip='Applies '+name+'. Notes placed relative to the selected root.';
       pill.addEventListener('click',()=>{ document.querySelectorAll('.scale-pill.active').forEach(p=>p.classList.remove('active')); pill.classList.add('active'); applyScale(name,intervals); });
       body.appendChild(pill);
     });
@@ -2076,6 +2101,8 @@ function renderKbdStrip(){
       let hint=NOTE_NAMES[pc];
       if(oct===kbOctave){ for(const[k,v] of Object.entries(KEY_LOWER)) if(v===pc){ hint=k.toUpperCase(); break; } }
       else if(oct===kbOctave+1){ for(const[k,v] of Object.entries(KEY_UPPER)) if(v===pc){ hint=k.toUpperCase(); break; } }
+      const freq=midiToFreq(mNote); const fStr=freq<1000?Math.round(freq)+' Hz':(freq/1000).toFixed(2)+' kHz';
+      key.dataset.tooltip=NOTE_NAMES[pc]+oct+' / MIDI '+mNote+' / '+fStr+'.';
       const labelEl=document.createElement('span'); labelEl.className='pk-label'; labelEl.textContent=hint;
       key.appendChild(labelEl);
       octEl.appendChild(key);
@@ -2099,6 +2126,8 @@ function renderKbdStrip(){
       let hint=NOTE_NAMES[pc];
       if(oct===kbOctave){ for(const[k,v] of Object.entries(KEY_LOWER)) if(v===pc){ hint=k.toUpperCase(); break; } }
       else if(oct===kbOctave+1){ for(const[k,v] of Object.entries(KEY_UPPER)) if(v===pc){ hint=k.toUpperCase(); break; } }
+      const bfreq=midiToFreq(mNote); const bfStr=bfreq<1000?Math.round(bfreq)+' Hz':(bfreq/1000).toFixed(2)+' kHz';
+      key.dataset.tooltip=NOTE_NAMES[pc]+oct+' / MIDI '+mNote+' / '+bfStr+'.';
       const labelEl=document.createElement('span'); labelEl.className='pk-label'; labelEl.textContent=hint;
       key.appendChild(labelEl);
       octEl.appendChild(key);
@@ -2242,12 +2271,15 @@ function buildSliders(track){
     col.appendChild(vrow);
     const srow=document.createElement('div'); srow.className='sliders-row';
     const gSl=makeCSlider(n,'gain',track,compact), qSl=makeCSlider(n,'q',track,compact);
+    gSl.wrap.dataset.tooltip='Drag to boost or cut this band. Double-click to reset to 0 dB.';
+    qSl.wrap.dataset.tooltip='Bandwidth. Higher Q = narrower bell. Double-click to reset to Q30.';
     srow.appendChild(gSl.wrap); srow.appendChild(qSl.wrap);
     col.appendChild(srow); track.sliderMap.set(n,{gain:gSl,q:qSl});
     const subrow=document.createElement('div'); subrow.className='sublabels-row';
     subrow.innerHTML=`<span class="sublabel gain">gn</span><span class="sublabel q">Q</span>`;
     col.appendChild(subrow);
     const rm=document.createElement('button'); rm.className='rm-note'; rm.textContent='×';
+    rm.dataset.tooltip='Removes this band.';
     rm.addEventListener('click',()=>{
       track.source=track.source.filter(x=>x!==n); track.baseNotes=track.baseNotes.filter(x=>x!==n);
       if(track.id==='inp') heldInputNotes.delete(n);
@@ -2299,77 +2331,77 @@ function buildTransformHTML(pf,isScale){
   const stepCls=isScale?' scale-step':'';
   return `
     <div class="chain-step off${stepCls}" id="${pf}card-mod" data-op="mod">
-      <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="mod">off</button>
-      <span class="step-name">Mod</span>
-      <input type="number" id="${pf}tx-mod" value="12" min="1" step="1" title="Wrap all notes into 0–n range"/>
+      <span class="drag-handle" data-tooltip="Drag to reorder. Step order affects the result.">⠿</span>
+      <button class="op-toggle off${cls}" data-op="mod" data-tooltip="Turns this step on or off.">off</button>
+      <span class="step-name" data-tooltip="Folds note numbers into the range 0 to N-1 using modular arithmetic. Collapses octaves when N=12.">Mod</span>
+      <input type="number" id="${pf}tx-mod" value="12" min="1" step="1" data-tooltip="Modulo N. Notes wrap into 0 to N-1."/>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-scale" data-op="scale">
-      <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="scale">off</button>
-      <span class="step-name">Multiply</span>
-      <input type="number" id="${pf}tx-mult" value="2" step="1" title="Scale all note values by this factor"/>
+      <span class="drag-handle" data-tooltip="Drag to reorder. Step order affects the result.">⠿</span>
+      <button class="op-toggle off${cls}" data-op="scale" data-tooltip="Turns this step on or off.">off</button>
+      <span class="step-name" data-tooltip="Multiplies every note number by a factor.">Multiply</span>
+      <input type="number" id="${pf}tx-mult" value="2" step="1" data-tooltip="The factor to multiply by. 2 doubles note numbers, 0.5 halves them."/>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-transpose" data-op="transpose">
-      <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="transpose">off</button>
-      <span class="step-name">Transpose</span>
-      <input type="number" id="${pf}tx-scalar" value="0" step="1" title="Semitones up or down"/>
+      <span class="drag-handle" data-tooltip="Drag to reorder. Step order affects the result.">⠿</span>
+      <button class="op-toggle off${cls}" data-op="transpose" data-tooltip="Turns this step on or off.">off</button>
+      <span class="step-name" data-tooltip="Shifts all notes by N semitones. Positive = up, negative = down.">Transpose</span>
+      <input type="number" id="${pf}tx-scalar" value="0" step="1" data-tooltip="Semitones to shift. Positive = up, negative = down."/>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-invert" data-op="invert">
-      <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="invert">off</button>
-      <span class="step-name">Invert</span>
-      <input type="number" id="${pf}tx-axis" value="0" step="1" title="Index of the pivot note"/>
+      <span class="drag-handle" data-tooltip="Drag to reorder. Step order affects the result.">⠿</span>
+      <button class="op-toggle off${cls}" data-op="invert" data-tooltip="Turns this step on or off.">off</button>
+      <span class="step-name" data-tooltip="Mirrors the note set around a pivot note. Intervals flip upside-down.">Invert</span>
+      <input type="number" id="${pf}tx-axis" value="0" step="1" data-tooltip="Pivot note index. 0 = lowest note. Notes mirror around it."/>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-complement" data-op="complement">
-      <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="complement">off</button>
-      <span class="step-name">Complement</span>
+      <span class="drag-handle" data-tooltip="Drag to reorder. Step order affects the result.">⠿</span>
+      <button class="op-toggle off${cls}" data-op="complement" data-tooltip="Turns this step on or off.">off</button>
+      <span class="step-name" data-tooltip="Replaces the set with all notes NOT in it, within the same pitch span.">Complement</span>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-parmode" data-op="parmode">
-      <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="parmode">off</button>
-      <span class="step-name">Parallel Mode</span>
-      <input type="number" id="${pf}tx-pm-k" value="0" step="1" title="Mode index k (wraps cyclically)"/>
+      <span class="drag-handle" data-tooltip="Drag to reorder. Step order affects the result.">⠿</span>
+      <button class="op-toggle off${cls}" data-op="parmode" data-tooltip="Turns this step on or off.">off</button>
+      <span class="step-name" data-tooltip="Rotates the scale to start from a different degree, keeping the same interval pattern.">Parallel Mode</span>
+      <input type="number" id="${pf}tx-pm-k" value="0" step="1" data-tooltip="Which degree to start from. 0 = original, 1 = 2nd degree, etc."/>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-relmode" data-op="relmode">
-      <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="relmode">off</button>
-      <span class="step-name">Relative Mode</span>
-      <input type="number" id="${pf}tx-rt-off" value="0" step="1" title="Start position (negative wraps from end)"/>
-      <input type="number" id="${pf}tx-rt-len" value="0" min="0" step="1" title="How many notes to take (0 = same as input)"/>
+      <span class="drag-handle" data-tooltip="Drag to reorder. Step order affects the result.">⠿</span>
+      <button class="op-toggle off${cls}" data-op="relmode" data-tooltip="Turns this step on or off.">off</button>
+      <span class="step-name" data-tooltip="Extracts a contiguous slice of notes starting at an offset.">Relative Mode</span>
+      <input type="number" id="${pf}tx-rt-off" value="0" step="1" data-tooltip="Start index. Negative values count from the end."/>
+      <input type="number" id="${pf}tx-rt-len" value="0" min="0" step="1" data-tooltip="How many notes to take. 0 keeps the same count as the input."/>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-mirror" data-op="mirror">
-      <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="mirror">off</button>
-      <span class="step-name">Mirror</span>
+      <span class="drag-handle" data-tooltip="Drag to reorder. Step order affects the result.">⠿</span>
+      <button class="op-toggle off${cls}" data-op="mirror" data-tooltip="Turns this step on or off.">off</button>
+      <span class="step-name" data-tooltip="Flips the note set: the top note stays and intervals descend.">Mirror</span>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-negative" data-op="negative">
-      <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="negative">off</button>
-      <span class="step-name">Negative</span>
-      <input type="number" id="${pf}tx-neg-root" value="0" step="1" title="Root pitch class (0–11). Axis = (root × 2 + 7) mod 12"/>
+      <span class="drag-handle" data-tooltip="Drag to reorder. Step order affects the result.">⠿</span>
+      <button class="op-toggle off${cls}" data-op="negative" data-tooltip="Turns this step on or off.">off</button>
+      <span class="step-name" data-tooltip="Reflects pitch classes around the axis between the root and fifth. Inverts the harmonic quality of the chord.">Negative</span>
+      <input type="number" id="${pf}tx-neg-root" value="0" step="1" data-tooltip="Root pitch class. 0 = C, 1 = C#, up to 11 = B."/>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-close" data-op="close">
-      <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="close">off</button>
-      <span class="step-name">Close</span>
+      <span class="drag-handle" data-tooltip="Drag to reorder. Step order affects the result.">⠿</span>
+      <button class="op-toggle off${cls}" data-op="close" data-tooltip="Turns this step on or off.">off</button>
+      <span class="step-name" data-tooltip="Packs all notes into the most-populated octave. Removes octave duplicates.">Close</span>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-spread" data-op="spread">
-      <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="spread">off</button>
-      <span class="step-name">Spread</span>
-      <label style="display:flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:9px;color:var(--text-dim);white-space:nowrap;cursor:pointer;user-select:none" title="Allow cluster at top">
-        <input type="checkbox" id="${pf}tx-sp-top" style="accent-color:var(--blue);cursor:pointer" title="Allow tight clustering at the top"/>top cluster
+      <span class="drag-handle" data-tooltip="Drag to reorder. Step order affects the result.">⠿</span>
+      <button class="op-toggle off${cls}" data-op="spread" data-tooltip="Turns this step on or off.">off</button>
+      <span class="step-name" data-tooltip="Voices notes across octaves to avoid tight clusters.">Spread</span>
+      <label style="display:flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:9px;color:var(--text-dim);white-space:nowrap;cursor:pointer;user-select:none" data-tooltip="Allows close clustering at the top of the voicing.">
+        <input type="checkbox" id="${pf}tx-sp-top" style="accent-color:var(--blue);cursor:pointer" data-tooltip="Allows tight clustering at the top of the voicing."/>top cluster
       </label>
     </div>
     <div class="chain-step off${stepCls}" id="${pf}card-resize" data-op="resize">
-      <span class="drag-handle">⠿</span>
-      <button class="op-toggle off${cls}" data-op="resize">off</button>
-      <span class="step-name">Resize</span>
-      <input type="number" id="${pf}tx-rs-start" value="0" step="1" title="First note index (wraps with octave scaling)"/>
-      <input type="number" id="${pf}tx-rs-end" value="3" step="1" title="Last note index (start > end reverses)"/>
+      <span class="drag-handle" data-tooltip="Drag to reorder. Step order affects the result.">⠿</span>
+      <button class="op-toggle off${cls}" data-op="resize" data-tooltip="Turns this step on or off.">off</button>
+      <span class="step-name" data-tooltip="Selects a range of notes by index. Out-of-range indices wrap cyclically with octave scaling.">Resize</span>
+      <input type="number" id="${pf}tx-rs-start" value="0" step="1" data-tooltip="First note index. Wraps cyclically for out-of-range values."/>
+      <input type="number" id="${pf}tx-rs-end" value="3" step="1" data-tooltip="Last note index. Set start > end to reverse the slice."/>
     </div>`;
 }
 
@@ -2664,6 +2696,57 @@ document.getElementById('themeToggle').addEventListener('click', () => {
 
   requestAnimationFrame(() => noTrans.remove());
 });
+
+// ═══════════════════════════════════════════════════════════
+//  TOOLTIP ENGINE
+// ═══════════════════════════════════════════════════════════
+(function(){
+  const tt=document.createElement('div');
+  tt.className='tt';
+  document.body.appendChild(tt);
+  let timer=null, active=null;
+
+  function show(el,x,y){
+    const text=el.dataset.tooltip;
+    if(!text) return;
+    tt.textContent=text;
+    position(x,y);
+    tt.classList.add('visible');
+  }
+  function position(x,y){
+    tt.style.left='-9999px'; tt.style.top='-9999px';
+    // force layout to get real width/height
+    const W=tt.offsetWidth, H=tt.offsetHeight;
+    const PAD=12, vw=window.innerWidth, vh=window.innerHeight;
+    let left=x+PAD, top=y-H-PAD;
+    if(left+W>vw-PAD) left=x-W-PAD;
+    if(left<PAD) left=PAD;
+    if(top<PAD) top=y+PAD;
+    if(top+H>vh-PAD) top=vh-H-PAD;
+    tt.style.left=left+'px'; tt.style.top=top+'px';
+  }
+  function hide(){ clearTimeout(timer); timer=null; active=null; tt.classList.remove('visible'); }
+
+  document.addEventListener('mouseover',e=>{
+    const el=e.target.closest('[data-tooltip]');
+    if(el===active) return;
+    hide();
+    if(!el) return;
+    active=el;
+    timer=setTimeout(()=>show(el,lastX,lastY),380);
+  });
+  document.addEventListener('mouseout',e=>{
+    const el=e.target.closest('[data-tooltip]');
+    if(!el) hide();
+  });
+  let lastX=0, lastY=0;
+  document.addEventListener('mousemove',e=>{
+    lastX=e.clientX; lastY=e.clientY;
+    if(tt.classList.contains('visible')&&active) position(e.clientX,e.clientY);
+  });
+  document.addEventListener('mousedown',hide);
+  document.addEventListener('scroll',hide,{passive:true});
+})();
 
 })();
 </script>
